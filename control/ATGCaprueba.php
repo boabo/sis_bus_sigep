@@ -31,7 +31,7 @@ use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=RAG287214500:a2ZJq1iVf9VWlVztKmtQ2WQPGjuPKMxysjE2WK4ZuYjA0bbqfiHuhO7GxCL0jLDHrBuA2m7OYyyXRa0cCRLM4TijiPEJlXOJ6Ckc",
+    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=RAG287214500:RGSk2ZJD60ipaoqnS12CqWXJarD1lLnDcJ5YSU8SrbcACiX4weLtm6kfveMte48jd6voqdIcg7I6Hm53rESxCgVM4aI7bmEMq8zo",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -70,7 +70,7 @@ if ($err) {
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => "GET",
         CURLOPT_HTTPHEADER => array(
-            "Authorization: " . $access_token,
+            "Authorization: bearer " . $access_token,
             "Cache-Control: no-cache",
             "Postman-Token: 011d15eb-f4ff-48db-85a6-1b380958342b"
         ),
@@ -108,6 +108,7 @@ if ($err) {
         $jsonConverter = new StandardConverter();
 
         $token = $response;
+        echo $token;
 
         $serializer = new JSONFlattenedSerializer($jsonConverter);
 

@@ -62,7 +62,7 @@ Phx.vista.TypeSigepServiceRequest=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'sigep_url',
 				fieldLabel: 'URL',
-				allowBlank: false,
+				allowBlank: true,
 				anchor: '80%',
 				gwidth: 150,
 				maxLength:200
@@ -137,7 +137,7 @@ Phx.vista.TypeSigepServiceRequest=Ext.extend(Phx.gridInterfaz,{
        		config:{
        			name:'queue_method',
        			fieldLabel:'Queue Method',
-       			allowBlank:false,
+       			allowBlank:true,
        			emptyText:'Meth...',
        			
        			typeAhead: false,
@@ -164,7 +164,7 @@ Phx.vista.TypeSigepServiceRequest=Ext.extend(Phx.gridInterfaz,{
        		config:{
        			name:'revert_method',
        			fieldLabel:'Revert Method',
-       			allowBlank:false,
+       			allowBlank:true,
        			emptyText:'Meth...',
        			
        			typeAhead: false,

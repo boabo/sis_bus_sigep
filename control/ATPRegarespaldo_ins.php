@@ -56,16 +56,16 @@ $jwsBuilder = new JWSBuilder(
 
 // The payload we want to sign. The payload MUST be a string hence we use our JSON Converter.
 $payload = $jsonConverter->encode([
-    'gestion' => 2018,
+    'gestion' => 2019,
     'idEntidad' => 494,
     'idDa' => 15,
-    'nroPreventivo' => 6332,
-    'nroCompromiso' => 1,
-    'nroDevengado' => 1,
+    'nroPreventivo' => 2458,
+    'nroCompromiso' => 0,
+    'nroDevengado' => 0,
     'nroPago' => 0,
     'nroSecuencia' => 0,
     'tipoDocRdo' => 4,
-    'nroDocRdo' => 7768,
+    'nroDocRdo' => 001,
     'gestionRdo' => null,
     'mesRdo' => null,
     'tipoRdo' => null,
@@ -75,9 +75,9 @@ $payload = $jsonConverter->encode([
     'procesoCompra' => null,
     'secDocRdo' => 1,
     'totalDocRdo' => 1,
-    'fechaElaboracionRdo' => "11/12/2018",
-    'fechaRecepcionRdo' => "11/12/2018",
-    'fechaVencimientoRdo' => "11/12/2018"
+    'fechaElaboracionRdo' => "21/05/2019",
+    'fechaRecepcionRdo' => "21/05/2019",
+    'fechaVencimientoRdo' => null
 ]);
 
 
@@ -104,7 +104,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:UWhEThnqAEibBO6Bvnes8rvaCC03H0XtQYf59wNQsTYOfD8bO5HTE1R0wALJOu0HRC5jdTWCSEd71kDYWZmlDYXe0FCge00XAXji",
+    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:DeruXDVKO4GmwXCSHWVWfFz9h0gQ1lzLy9Lmdnd3pjN62z4ozTszW8hygo1oOCvWvna2O7Zgcpf5vFWvAranO8IEhTpm9NjM2l57",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -145,7 +145,7 @@ if ($err) {
         CURLOPT_CUSTOMREQUEST => "POST",
         CURLOPT_POSTFIELDS => $token,
         CURLOPT_HTTPHEADER => array(
-            "authorization: " . $access_token,
+            "authorization: bearer " . $access_token,
             "cache-control: no-cache",
             "content-type: application/json",
             "postman-token: a3949f68-6846-29c1-0219-282f88c61cbb"
@@ -185,11 +185,11 @@ if ($err) {
         // The JSON Converter.
         $jsonConverter = new StandardConverter();
 
-//        var_dump($token);
+        var_dump($token);
         $token = $response;
 
-        /*echo $token;
-        exit;*/
+        //echo $token;
+        //exit;*/
         $serializer = new JSONFlattenedSerializer($jsonConverter);
 
         // We try to load the token.

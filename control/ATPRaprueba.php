@@ -48,12 +48,12 @@ $jwsBuilder = new JWSBuilder(
 
 // The payload we want to sign. The payload MUST be a string hence we use our JSON Converter.
 $payload = $jsonConverter->encode([
-    'gestion' => 2018,
+    'gestion' => 2019,
     'idEntidad' => 494,
     'idDa' => 15,
-    'nroPreventivo' => 6332,
-    'nroCompromiso' => 1,
-    'nroDevengado' => 1,
+    'nroPreventivo' => 2458,
+    'nroCompromiso' => 0,
+    'nroDevengado' => 0,
     'nroPago' => 0,
     'nroSecuencia' => 0
 ]);
@@ -81,7 +81,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=RAG287214500:a2ZJq1iVf9VWlVztKmtQ2WQPGjuPKMxysjE2WK4ZuYjA0bbqfiHuhO7GxCL0jLDHrBuA2m7OYyyXRa0cCRLM4TijiPEJlXOJ6Ckc",
+    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=RAG287214500:RGSk2ZJD60ipaoqnS12CqWXJarD1lLnDcJ5YSU8SrbcACiX4weLtm6kfveMte48jd6voqdIcg7I6Hm53rESxCgVM4aI7bmEMq8zo",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -122,7 +122,7 @@ if ($err) {
         CURLOPT_CUSTOMREQUEST => "PUT",
         CURLOPT_POSTFIELDS => $token,
         CURLOPT_HTTPHEADER => array(
-            "authorization: " . $access_token,
+            "authorization: bearer " . $access_token,
             "cache-control: no-cache",
             "content-type: application/json",
             "postman-token: a3949f68-6846-29c1-0219-282f88c61cbb"
@@ -130,6 +130,7 @@ if ($err) {
     ));
 
     $response = curl_exec($curl);
+    //var_dump('esto es:', $response);exit;
 
     $err = curl_error($curl);
 
@@ -160,8 +161,9 @@ if ($err) {
 
         // The JSON Converter.
         $jsonConverter = new StandardConverter();
-//        var_dump($token);
+        //var_dump($token);
         $token = $response;
+        echo $token;
         $serializer = new JSONFlattenedSerializer($jsonConverter);
 
         // We try to load the token.

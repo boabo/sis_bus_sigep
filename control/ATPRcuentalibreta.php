@@ -57,10 +57,10 @@ $jwsBuilder = new JWSBuilder(
 
 // The payload we want to sign. The payload MUST be a string hence we use our JSON Converter.
 $payload = $jsonConverter->encode([
-    'gestion' => 2018,
+    'gestion' => 2019,
     'idEntidad' => 494,
     'idDa' => 15,
-    'nroPreventivo' => 6332,
+    'nroPreventivo' => 2442,
     'nroCompromiso' => 1,
     'nroDevengado' => 1,
     'nroPago' => 0,
@@ -96,7 +96,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:yH9XighrPKILG76yoQ4xWYMfjvpOQXXMfNEOsOTvyLMPy230CfOrQTESlJl76KvFSusgbgJj7fu2kM3Ze1KH94TVKJIos9czsKbq",
+    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:DeruXDVKO4GmwXCSHWVWfFz9h0gQ1lzLy9Lmdnd3pjN62z4ozTszW8hygo1oOCvWvna2O7Zgcpf5vFWvAranO8IEhTpm9NjM2l57",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -137,7 +137,7 @@ if ($err) {
         CURLOPT_CUSTOMREQUEST => "PUT",
         CURLOPT_POSTFIELDS => $token,
         CURLOPT_HTTPHEADER => array(
-            "authorization: " . $access_token,
+            "authorization: bearer " . $access_token,
             "cache-control: no-cache",
             "content-type: application/json",
             "postman-token: a3949f68-6846-29c1-0219-282f88c61cbb"

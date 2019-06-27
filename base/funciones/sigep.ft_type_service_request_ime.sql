@@ -1,19 +1,22 @@
-CREATE OR REPLACE FUNCTION "sigep"."ft_type_service_request_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION sigep.ft_type_service_request_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sigep
  FUNCION: 		sigep.ft_type_service_request_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'sigep.ttype_service_request'
  AUTOR: 		 (admin)
  FECHA:	        29-11-2018 04:31:24
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				29-11-2018 04:31:24								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'sigep.ttype_service_request'	
+ #0				29-11-2018 04:31:24								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'sigep.ttype_service_request'
  #
  ***************************************************************************/
 
@@ -26,21 +29,21 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_type_service_request	integer;
-			    
+
 BEGIN
 
     v_nombre_funcion = 'sigep.ft_type_service_request_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'SIG_TSR_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		29-11-2018 04:31:24
 	***********************************/
 
 	if(p_transaccion='SIG_TSR_INS')then
-					
+
         begin
         	--Sentencia de la insercion
         	insert into sigep.ttype_service_request(
@@ -63,13 +66,13 @@ BEGIN
 			v_parametros._id_usuario_ai,
 			null,
 			null
-							
-			
-			
+
+
+
 			)RETURNING id_type_service_request into v_id_type_service_request;
-			
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Type Service Request almacenado(a) con exito (id_type_service_request'||v_id_type_service_request||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Type Service Request almacenado(a) con exito (id_type_service_request'||v_id_type_service_request||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_type_service_request',v_id_type_service_request::varchar);
 
             --Devuelve la respuesta
@@ -77,10 +80,10 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'SIG_TSR_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		29-11-2018 04:31:24
 	***********************************/
 
@@ -96,20 +99,20 @@ BEGIN
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai
 			where id_type_service_request=v_parametros.id_type_service_request;
-               
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Type Service Request modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Type Service Request modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_type_service_request',v_parametros.id_type_service_request::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'SIG_TSR_ELI'
  	#DESCRIPCION:	Eliminacion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		29-11-2018 04:31:24
 	***********************************/
 
@@ -119,33 +122,39 @@ BEGIN
 			--Sentencia de la eliminacion
 			delete from sigep.ttype_service_request
             where id_type_service_request=v_parametros.id_type_service_request;
-               
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Type Service Request eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Type Service Request eliminado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_type_service_request',v_parametros.id_type_service_request::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-         
+
 	else
-     
+
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 
 	end if;
 
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-				        
+
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
-ALTER FUNCTION "sigep"."ft_type_service_request_ime"(integer, integer, character varying, character varying) OWNER TO postgres;
+
+ALTER FUNCTION sigep.ft_type_service_request_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

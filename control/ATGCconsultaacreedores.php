@@ -14,72 +14,6 @@ use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
-
-
-/*****************************************************
- *
- *
- * SERIALIZAR MENSAJE
- *
- *
- * ********************************************************/
-// The algorithm manager with the HS256 algorithm.
-$algorithmManager = AlgorithmManager::create([
-    new RS512(),
-]);
-
-
-$jwk = JWKFactory::createFromKeyFile(
-    '../boa.key', // The filename
-    null,                   // Secret if the key is encrypted
-    [
-        'use' => 'sig',         // Additional parameters
-        'kid' => 'boaws'
-    ]
-);
-
-$jsonConverter = new StandardConverter();
-
-// We instantiate our JWS Builder.
-$jwsBuilder = new JWSBuilder(
-    $jsonConverter,
-    $algorithmManager
-);
-if (isset($_POST['action'])) {
-
-    if ($_POST['action']=='register') {
-        $nroPreventivo = $_POST['nroPreventivo'];
-        $nroCompromiso = $_POST['nroCompromiso'];
-        $nroDevengado= $_POST['nroDevengado'];
-        $nroPago= $_POST['nroPago'];
-        $nroSecuencia= $_POST['nroSecuencia'];
-
-    }
-}
-// The payload we want to sign. The payload MUST be a string hence we use our JSON Converter.
-$payload = $jsonConverter->encode([
-    'gestion' => 2019,
-    'idEntidad' => 494,
-    'idDa' => 15,
-    'nroPreventivo' => 2458,
-    'nroCompromiso' => 0,
-    'nroDevengado' => 0,
-    'nroPago' => 0,
-    'nroSecuencia' => 0
-]);
-
-$jws = $jwsBuilder
-    ->create()                               // We want to create a new JWS
-    ->withPayload($payload)                  // We set the payload
-    ->addSignature($jwk, ['alg' => 'RS512'],['kid' => 'boaws']) // We add a signature with a simple protected header
-    ->build();
-
-
-$serializer = new JSONFlattenedSerializer($jsonConverter); // The serializer
-
-$token = $serializer->serialize($jws, 0); // We serialize the signature at index 0 (we only have one signature).
-
-
 /*************************************************
  *
  *
@@ -91,7 +25,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:DeruXDVKO4GmwXCSHWVWfFz9h0gQ1lzLy9Lmdnd3pjN62z4ozTszW8hygo1oOCvWvna2O7Zgcpf5vFWvAranO8IEhTpm9NjM2l57",
+    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACA561396900:dGU4KTOLNb5lVWpSPBMJZyWzLd75ylKyQNcRhisIHyVEUKSP1oyummSZ55fHewlvSyf5eE28rSJq9MXvLolokWtzyrNmqbOnZcOm",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -109,38 +43,46 @@ $err = curl_error($curl);
 
 curl_close($curl);
 
+if (isset($_POST['action'])) {
+
+    if ($_POST['action']=='register') {
+        $nroPreventivo = $_POST['nroPreventivo'];
+        $nroCompromiso = $_POST['nroCompromiso'];
+        $nroDevengado= $_POST['nroDevengado'];
+        $nroPago= $_POST['nroPago'];
+        $fecha = "13/05/2019";
+
+    }
+}
+
 if ($err) {
     echo "cURL Error #:" . $err;
 } else {
     /*************************************************
      *
      *
-     * HACER PETICION POST
+     * HACER PETICION GET
      *
      **************************************************/
-    $token_response = json_decode($response);	
+    $token_response = json_decode($response);
     $access_token = $token_response->{'access_token'};
     $curl = curl_init();
-
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egadocumentos/verifica",
+        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsclasificadores/api/v1/acreedores?fecha=".'27/05/2019'."",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
         CURLOPT_TIMEOUT => 30,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "PUT",
-        CURLOPT_POSTFIELDS => $token,
+        CURLOPT_CUSTOMREQUEST => "GET",
         CURLOPT_HTTPHEADER => array(
-            "authorization: bearer " . $access_token,
-            "cache-control: no-cache",
-            "content-type: application/json",
-            "postman-token: a3949f68-6846-29c1-0219-282f88c61cbb"
+            "Authorization: bearer " . $access_token,
+            "Cache-Control: no-cache",
+            "Postman-Token: 011d15eb-f4ff-48db-85a6-1b380958342b"
         ),
     ));
 
     $response = curl_exec($curl);
-	
     $err = curl_error($curl);
 
     curl_close($curl);
@@ -170,14 +112,17 @@ if ($err) {
 
         // The JSON Converter.
         $jsonConverter = new StandardConverter();
-        var_dump($token);
+
         $token = $response;
+
+        //echo $token;
+
         $serializer = new JSONFlattenedSerializer($jsonConverter);
 
         // We try to load the token.
         $jws = $serializer->unserialize($token);
         echo '<pre>' . var_export(json_decode($jws->getPayload()), true) . '</pre>';
-//        var_dump($jws);
+        //var_dump($jws);
         $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);
     }
 }

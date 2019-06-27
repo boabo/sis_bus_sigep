@@ -49,12 +49,14 @@ class MODServiceRequest extends MODbase{
 	}
 			
 	function insertarServiceRequest(){
+	    //var_dump('insertarServiceRequest');exit;
 		$cone = new conexion();
         $link = $cone->conectarpdo();
                    
         try {
             $link->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);     
             $jsonOb = $this->aParam->_json_decode($this->aParam->getParametro('json'));
+            //var_dump('insertar objeto:', $jsonOb);
 			
             $link->beginTransaction();	
 			$this->transaccion = 'SIG_SERE_INS';	
@@ -77,6 +79,7 @@ class MODServiceRequest extends MODbase{
             }
             
             $respuesta = $resp_procedimiento['datos'];
+
             
             $id_service_request = $respuesta['id_service_request'];
 			
@@ -133,7 +136,8 @@ class MODServiceRequest extends MODbase{
 		$this->arreglo['user_name'] = $user;
 		
 		$this->arreglo['exec_order'] = $exec_order;
-		if ($exec_order == 1 ) {
+        //var_dump('resultado array:',$this->arreglo['exec_order']);
+		if ($exec_order == 1 ){
 			$this->arreglo['status'] = "next_to_execute";
 		} else {
 			$this->arreglo['status'] = "pending";
@@ -266,12 +270,12 @@ class MODServiceRequest extends MODbase{
 		return $this->respuesta;
 	}
 	
-	function getInputParams($link, $id_service_request) {
+	function getOutParams($link, $id_service_request) {
 		$res = array();
 		$sql = "SELECT  rp.name, rp.value, rp.ctype, ssr.id_sigep_service_request,tssr.id_type_sigep_service_request, tssr.json_main_container
 				FROM sigep.tsigep_service_request ssr
-				JOIN sigep.ttype_sigep_service_request tssr ON tssr.id_type_sigep_service_request = ssr.id_type_sigep_service_request
-				JOIN sitep.trequest_param rp ON rp.id_sigep_service_request
+				inner JOIN sigep.ttype_sigep_service_request tssr ON tssr.id_type_sigep_service_request = ssr.id_type_sigep_service_request
+				inner JOIN sigep.trequest_param rp ON rp.id_sigep_service_request = ssr.id_sigep_service_request
 				WHERE input_output = 'output' and id_service_request = $id_service_request
 				ORDER BY tssr.json_main_container,ssr.id_sigep_service_request";
 		$id_sigep_service_request = "";
