@@ -61,9 +61,9 @@ $payload = $jsonConverter->encode([
     'gestion' => 2019,
     'idEntidad' => 494,
     'idDa' => 15,
-    'nroPreventivo' => 2458,
+    'nroPreventivo' => 0,
     'nroCompromiso' => 0,
-    'nroDevengado' => 0,
+    'nroDevengado' => 737,
     'nroPago' => 0,
     'nroSecuencia' => 0
 ]);
@@ -91,7 +91,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:DeruXDVKO4GmwXCSHWVWfFz9h0gQ1lzLy9Lmdnd3pjN62z4ozTszW8hygo1oOCvWvna2O7Zgcpf5vFWvAranO8IEhTpm9NjM2l57",
+    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:FIjmQpcjzzYNEjOD61rsQ8eYnlediCY9wDMOTvckiFdU1um1XeHXp8SWkaUkosISNQ7DP9HXfAipuRsXa7XVLe2CmWCwcPOL03BB",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -177,7 +177,7 @@ if ($err) {
         // We try to load the token.
         $jws = $serializer->unserialize($token);
         echo '<pre>' . var_export(json_decode($jws->getPayload()), true) . '</pre>';
-//        var_dump($jws);
+        var_dump($jws);
         $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);
     }
 }

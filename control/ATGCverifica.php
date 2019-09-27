@@ -108,13 +108,15 @@ if ($err) {
         $jsonConverter = new StandardConverter();
 
         $token = $response;
+        var_dump($token);
+
 
         $serializer = new JSONFlattenedSerializer($jsonConverter);
 
         // We try to load the token.
         $jws = $serializer->unserialize($token);
         echo '<pre>' . var_export(json_decode($jws->getPayload()), true) . '</pre>';
-        //var_dump($jws);
+        var_dump($jws);
         $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);
     }
 }

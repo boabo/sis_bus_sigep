@@ -35,6 +35,7 @@ class MODUserMapping extends MODbase{
 		$this->captura('usuario_ai','varchar');
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('fecha_mod','timestamp');
+        $this->captura('authorization_code','varchar');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		
@@ -111,6 +112,7 @@ class MODUserMapping extends MODbase{
 		$this->setParametro('access_token','access_token','varchar');
 		$this->setParametro('refresh_token','refresh_token','varchar');
 		$this->setParametro('expires_in','expires_in','int4');
+        $this->setParametro('authorization_code','authorization_code','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

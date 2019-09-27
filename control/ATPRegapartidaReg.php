@@ -51,13 +51,13 @@ $payload = $jsonConverter->encode([
     'gestion' => 2019,
     'idEntidad' => 494  ,
     'idDa' => 15,
-    'nroPreventivo' => 3023,
-    'nroCompromiso' => 0,
-    'nroDevengado' => 0,
+    'nroPreventivo' => 4027,
+    'nroCompromiso' => 1,
+    'nroDevengado' => 1,
     'nroPago' => 0,
     'nroSecuencia' => 0,
-    'idPtogto' => 3467401,
-    'montoMo' => 54599
+    'idPtogto' => 3099137,
+    'montoMo' => 15
 ]);
 
 $jws = $jwsBuilder

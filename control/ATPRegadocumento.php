@@ -57,30 +57,30 @@ $payload = $jsonConverter->encode([
     'nroPago' => 0,
     'nroSecuencia' => 0,
     'nroDevengadoSip' => 0,
-    'tipoFormulario' => "C",
+    'tipoFormulario' => "S",
     'tipoDocumento' => "O",
     'tipoEjecucion' => "N",
-    'preventivo' => "S",
+    'preventivo' => "N",
     'compromiso' => "N",
     'devengado' => "N",
     'pago' => "N",
-    'devengadoSip' => "N",
+    'devengadoSip' => "S",
     'pagoSip' => "N",
-    "regularizacion"=> "N",
-    "fechaElaboracion"=> "03/06/2019",
-    "claseGastoCip"=> 4,
-    "claseGastoSip"=> NULL,
+    "regularizacion"=> "S",
+    "fechaElaboracion"=> "26/09/2019",
+    "claseGastoCip"=> NULL,
+    "claseGastoSip"=> 3,
     "idCatpry"=> null,
     "sigade"=> null,
     "otfin"=> null,
-    "resumenOperacion"=> "Publicacion8 forma manual junio 2019",
+    "resumenOperacion"=> "Publicacion SIP forma manual septiembre 2019",
     "moneda"=> 69,
-    "fechaTipoCambio"=> "03/06/2019",
+    "fechaTipoCambio"=> "26/09/2019",
     "compraVenta"=> "C",
-    "totalAutorizadoMo"=> 110464,
+    "totalAutorizadoMo"=> 10,
     "totalRetencionesMo"=> 0,
     "totalMultasMo"=> 0,
-    "liquidoPagableMo"=> 0,
+    "liquidoPagableMo"=> 10,
 ]);
 
 $jws = $jwsBuilder
@@ -106,7 +106,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:DeruXDVKO4GmwXCSHWVWfFz9h0gQ1lzLy9Lmdnd3pjN62z4ozTszW8hygo1oOCvWvna2O7Zgcpf5vFWvAranO8IEhTpm9NjM2l57",
+    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:FIjmQpcjzzYNEjOD61rsQ8eYnlediCY9wDMOTvckiFdU1um1XeHXp8SWkaUkosISNQ7DP9HXfAipuRsXa7XVLe2CmWCwcPOL03BB",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -156,7 +156,7 @@ if ($err) {
 
     $response = curl_exec($curl);
     $err = curl_error($curl);
-
+    $http_code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
     curl_close($curl);
 
     if ($err) {
@@ -187,6 +187,7 @@ if ($err) {
         
         $token = $response;
 		echo $token;
+		var_dump($http_code);
         $serializer = new JSONFlattenedSerializer($jsonConverter);
 
         // We try to load the token.

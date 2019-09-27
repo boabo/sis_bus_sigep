@@ -246,6 +246,7 @@ class MODSigepServiceRequest extends MODbase{
         $response = curl_exec($curl);
         var_dump('respuesta decode:',$response);
         $err = curl_error($curl);
+        $http_code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
         //var_dump('error decode:',$err);
 
         curl_close($curl);
@@ -289,7 +290,7 @@ class MODSigepServiceRequest extends MODbase{
                 /*$jws = $serializer->unserialize($token);
                 $resObj = json_decode($jws->getPayload(), true);*/
 
-                if (isset($resObj['data']['errores'])) {
+                if (isset($resObj['data']['errores'])|| $http_code == '500') {
                     $this->serviceError($link,$id_sigep_service_request,$id_service_request, "MENSAJE:".$resObj['data']['errores'][0]['mensaje'].",CAUSA:".$resObj['data']['errores'][0]['causa'].",ACCION: ".$resObj['data']['errores'][0]['accion'],'no');
                 } else if(isset($resObj['data']['C31']) && !is_array($resObj['data']['C31'])){
                     $this->serviceError($link,$id_sigep_service_request,$id_service_request, $resObj['data']['C31'], 'no');
@@ -341,6 +342,7 @@ class MODSigepServiceRequest extends MODbase{
 
     }
     function getInputParams($link, $id_sigep_service_request,$status) {
+        var_dump('atributos:',$id_sigep_service_request, $status);
 
         if ($status == "next_to_execute" || $status == 'next_to_revert') {
             $res = array();

@@ -14,69 +14,6 @@ use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
-
-
-/*****************************************************
-TITULO:         Modificación Distribución de Beneficiarios – Cuentas Contables
-SISTEMA:		Servicios SIGEP
-METHOD: 		PUT (Sincrono)
-AUTOR: 		    RZABALA
-FECHA:	        09-10-2018 09:09:45
-DESCRIPCION:    Modifica los importes de distribución de beneficiarios-Cuentas
- *              Contables del C-31, se mantiene las condiciones para la modificación de importes via aplicación.
- * ********************************************************/
-// The algorithm manager with the HS256 algorithm.
-$algorithmManager = AlgorithmManager::create([
-    new RS512(),
-]);
-
-
-$jwk = JWKFactory::createFromKeyFile(
-    '../boa.key', // The filename
-    null,                   // Secret if the key is encrypted
-    [
-        'use' => 'sig',         // Additional parameters
-        'kid' => 'boaws'
-    ]
-);
-
-$jsonConverter = new StandardConverter();
-
-// We instantiate our JWS Builder.
-$jwsBuilder = new JWSBuilder(
-    $jsonConverter,
-    $algorithmManager
-);
-
-// The payload we want to sign. The payload MUST be a string hence we use our JSON Converter.
-$payload = $jsonConverter->encode([
-    'gestion' => 2019,
-    'idEntidad' => 494,
-    'idDa' => 15,
-    'nroPreventivo' => 0,
-    'nroCompromiso' => 0,
-    'nroDevengado' => 725,
-    'nroPago' => 0,
-    'nroSecuencia' => 0,
-    'beneficiario' => 83797,
-    'modeloContable' => 1,
-    'cuentaContable' => '2.1.5.1',
-    'secEgaclib' => 1,
-    'montoMo' => 10
-]);
-
-$jws = $jwsBuilder
-    ->create()                               // We want to create a new JWS
-    ->withPayload($payload)                  // We set the payload
-    ->addSignature($jwk, ['alg' => 'RS512'],['kid' => 'boaws']) // We add a signature with a simple protected header
-    ->build();
-
-
-$serializer = new JSONFlattenedSerializer($jsonConverter); // The serializer
-
-$token = $serializer->serialize($jws, 0); // We serialize the signature at index 0 (we only have one signature).
-
-
 /*************************************************
  *
  *
@@ -112,27 +49,24 @@ if ($err) {
     /*************************************************
      *
      *
-     * HACER PETICION POST
+     * HACER PETICION GET
      *
      **************************************************/
     $token_response = json_decode($response);
     $access_token = $token_response->{'access_token'};
     $curl = curl_init();
-
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egabencuentacontable",
+        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/ejecucion-gasto/api/cola/ega_cuentas_contables/" . $_GET["cola_id"],
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
         CURLOPT_TIMEOUT => 30,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "PUT",
-        CURLOPT_POSTFIELDS => $token,
+        CURLOPT_CUSTOMREQUEST => "GET",
         CURLOPT_HTTPHEADER => array(
-            "authorization: bearer " . $access_token,
-            "cache-control: no-cache",
-            "content-type: application/json",
-            "postman-token: a3949f68-6846-29c1-0219-282f88c61cbb"
+            "Authorization: bearer " . $access_token,
+            "Cache-Control: no-cache",
+            "Postman-Token: 011d15eb-f4ff-48db-85a6-1b380958342b"
         ),
     ));
 
@@ -166,13 +100,14 @@ if ($err) {
 
         // The JSON Converter.
         $jsonConverter = new StandardConverter();
-		
+
         $token = $response;
+
+        echo $token;
+
         $serializer = new JSONFlattenedSerializer($jsonConverter);
 
         // We try to load the token.
-        echo $token;
-	
         $jws = $serializer->unserialize($token);
         echo '<pre>' . var_export(json_decode($jws->getPayload()), true) . '</pre>';
         //var_dump($jws);

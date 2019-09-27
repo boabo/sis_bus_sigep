@@ -25,7 +25,7 @@ use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=SCY485838000:dRR2cnqs3MOdIUki5riGmN080DJ9HXd0Z2vPN4bZw1fTrOv8mT2vKFEczIP4fY009ZmbPpqRrEGZbn1KGhH5jzYNbRNyc9VOX430",
+    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=SCY485838000:lcS57IQZYaEeCq3apbPoSPuXflQW3AKmE6muBMNqnsAthzgZl0eZa7tvallzeCbVK9YKwQZaQlgf7Jp3OfAPxp3BBjUN8fniiiLw",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -69,8 +69,8 @@ if ($err) {
     $access_token = $token_response->{'access_token'};
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsbeneficiarios/api/v1/beneficiarios/natural?numeroDocumento=&primerApellido=ZABALA&segundoApellido=MITA&nombres=ROMER&fechaNacimiento=19-03-1984",
-        //CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsbeneficiarios/api/v1/beneficiarios/juridico?numeroDocumento=190980028",
+        //CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsbeneficiarios/api/v1/beneficiarios/natural?numeroDocumento=&primerApellido=ZABALA&segundoApellido=MITA&nombres=ROMER&fechaNacimiento=19-03-1984",
+        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsbeneficiarios/api/v1/beneficiarios/juridico?numeroDocumento=4512134014",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,

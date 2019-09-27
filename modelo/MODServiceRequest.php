@@ -112,7 +112,8 @@ class MODServiceRequest extends MODbase{
 				ORDER BY exec_order";
 	    
 	    foreach ($link->query($sql) as $row) {
-	    	if ($row['json_main_container']) { 
+	    	if ($row['json_main_container']) {
+	    	    //var_dump('json:',$row['json_main_container']);
 	        	foreach ($json_obj[$row['json_main_container']] as $detail) {
 	        		$id_sigep_service_request = $this->insertaSigepServiceRequest($link,$id_service_request,$row['id_type_sigep_service_request'],$json_obj[$row['user_param']],$row['exec_order']);
 					$this->insertaParams($link,$id_sigep_service_request,$row['id_type_sigep_service_request'],$json_obj,$detail);
