@@ -51,9 +51,9 @@ $payload = $jsonConverter->encode([
     'gestion' => 2019,
     'idEntidad' => 494,
     'idDa' => 15,
-    'nroPreventivo' => 2458,
-    'nroCompromiso' => 0,
-    'nroDevengado' => 0,
+    'nroPreventivo' => 3561,
+    'nroCompromiso' => 1,
+    'nroDevengado' => 1,
     'nroPago' => 0,
     'nroSecuencia' => 0
 ]);

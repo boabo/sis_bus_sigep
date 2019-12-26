@@ -61,26 +61,26 @@ $payload = $jsonConverter->encode([
     'tipoDocumento' => "O",
     'tipoEjecucion' => "N",
     'preventivo' => "S",
-    'compromiso' => "N",
-    'devengado' => "N",
+    'compromiso' => "S",
+    'devengado' => "S",
     'pago' => "N",
     'devengadoSip' => "N",
     'pagoSip' => "N",
     "regularizacion"=> "N",
-    "fechaElaboracion"=> "03/06/2019",
-    "claseGastoCip"=> 4,
-    "claseGastoSip"=> NULL,
+    "fechaElaboracion"=> "02/12/2019",
+    "claseGastoCip"=> 1,
+    "claseGastoSip"=> null,
     "idCatpry"=> null,
     "sigade"=> null,
     "otfin"=> null,
-    "resumenOperacion"=> "Publicacion8 forma manual junio 2019",
+    "resumenOperacion"=> "Publicacion forma manual planillas diciembre 2019",
     "moneda"=> 69,
-    "fechaTipoCambio"=> "03/06/2019",
+    "fechaTipoCambio"=> "02/10/2019",
     "compraVenta"=> "C",
-    "totalAutorizadoMo"=> 110464,
-    "totalRetencionesMo"=> 0,
+    "totalAutorizadoMo"=> 1000,
+    "totalRetencionesMo"=> 200,
     "totalMultasMo"=> 0,
-    "liquidoPagableMo"=> 0,
+    "liquidoPagableMo"=> 800,
 ]);
 
 $jws = $jwsBuilder
@@ -106,7 +106,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:DeruXDVKO4GmwXCSHWVWfFz9h0gQ1lzLy9Lmdnd3pjN62z4ozTszW8hygo1oOCvWvna2O7Zgcpf5vFWvAranO8IEhTpm9NjM2l57",
+    CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:vmIGOk050ZEbb8afnwXRUad3jFoKotQjyl9aArcMf9v5OMHKPLkuY4YgtMysm0MUaqZD9feeUgVbm6rCiZk0yvvVcsnQW5GlNqr6",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -138,7 +138,7 @@ if ($err) {
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egadocumento",
+        CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egadocumento",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
@@ -156,7 +156,7 @@ if ($err) {
 
     $response = curl_exec($curl);
     $err = curl_error($curl);
-
+    $http_code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
     curl_close($curl);
 
     if ($err) {
@@ -187,6 +187,7 @@ if ($err) {
         
         $token = $response;
 		echo $token;
+		var_dump($http_code);
         $serializer = new JSONFlattenedSerializer($jsonConverter);
 
         // We try to load the token.

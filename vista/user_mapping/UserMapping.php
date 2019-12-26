@@ -9,9 +9,40 @@
 
 header("content-type: text/javascript; charset=UTF-8");
 ?>
+
+<style type="text/css" rel="stylesheet">
+    .x-selectable,
+    .x-selectable * {
+        -moz-user-select: text !important;
+        -khtml-user-select: text !important;
+        -webkit-user-select: text !important;
+    }
+
+    .x-grid-row td,
+    .x-grid-summary-row td,
+    .x-grid-cell-text,
+    .x-grid-hd-text,
+    .x-grid-hd,
+    .x-grid-row,
+
+    .x-grid-row,
+    .x-grid-cell,
+    .x-unselectable
+    {
+        -moz-user-select: text !important;
+        -khtml-user-select: text !important;
+        -webkit-user-select: text !important;
+    }
+</style>
+
 <script>
 Phx.vista.UserMapping=Ext.extend(Phx.gridInterfaz,{
-
+    viewConfig: {
+        stripeRows: false,
+        getRowClass: function(record) {
+            return "x-selectable";
+        }
+    },
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
@@ -92,6 +123,21 @@ Phx.vista.UserMapping=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:false
 		},
+        {
+            config:{
+                name: 'authorization_code',
+                fieldLabel: 'Authorization Code',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 120,
+                maxLength:100
+            },
+            type:'TextField',
+            filters:{pfiltro:'usm.authorization_code',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
 		{
 			config:{
 				name: 'date_issued_at',
@@ -255,6 +301,7 @@ Phx.vista.UserMapping=Ext.extend(Phx.gridInterfaz,{
 		{name:'usuario_ai', type: 'string'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+        {name:'authorization_code', type: 'string'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
 		

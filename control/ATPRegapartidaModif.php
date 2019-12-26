@@ -51,13 +51,13 @@ $payload = $jsonConverter->encode([
     'gestion' => 2019,
     'idEntidad' => 494  ,
     'idDa' => 15,
-    'nroPreventivo' => 1368,
-    'nroCompromiso' => 0,
-    'nroDevengado' => 0,
+    'nroPreventivo' => 3967,
+    'nroCompromiso' => 1,
+    'nroDevengado' => 1,
     'nroPago' => 0,
     'nroSecuencia' => 0,
-    'idPtogto' => 3099097,
-    'montoMo' => 200
+    'idPtogto' => 3108003,
+    'montoMo' => 15
     //"usuario" => "CPITA"
 ]);
 

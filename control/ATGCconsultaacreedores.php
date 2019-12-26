@@ -115,7 +115,7 @@ if ($err) {
 
         $token = $response;
 
-        //echo $token;
+        echo $token;
 
         $serializer = new JSONFlattenedSerializer($jsonConverter);
 

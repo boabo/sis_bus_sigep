@@ -48,10 +48,10 @@ $jwsBuilder = new JWSBuilder(
 
 // The payload we want to sign. The payload MUST be a string hence we use our JSON Converter.
 $payload = $jsonConverter->encode([
-    'gestion' => 2018,
+    'gestion' => 2019,
     'idEntidad' => 494,
     'idDa' => 15,
-    'nroPreventivo' => 6330,
+    'nroPreventivo' => 6318,
     'nroCompromiso' => 1,
     'nroDevengado' => 1,
     'nroPago' => 0,
@@ -81,7 +81,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:yH9XighrPKILG76yoQ4xWYMfjvpOQXXMfNEOsOTvyLMPy230CfOrQTESlJl76KvFSusgbgJj7fu2kM3Ze1KH94TVKJIos9czsKbq",
+    CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:vmIGOk050ZEbb8afnwXRUad3jFoKotQjyl9aArcMf9v5OMHKPLkuY4YgtMysm0MUaqZD9feeUgVbm6rCiZk0yvvVcsnQW5GlNqr6",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -113,7 +113,7 @@ if ($err) {
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egadocumentos/desverifica",
+        CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egadocumentos/desverifica",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
@@ -122,7 +122,7 @@ if ($err) {
         CURLOPT_CUSTOMREQUEST => "PUT",
         CURLOPT_POSTFIELDS => $token,
         CURLOPT_HTTPHEADER => array(
-            "authorization: " . $access_token,
+            "authorization: bearer " . $access_token,
             "cache-control: no-cache",
             "content-type: application/json",
             "postman-token: a3949f68-6846-29c1-0219-282f88c61cbb"
@@ -160,14 +160,14 @@ if ($err) {
 
         // The JSON Converter.
         $jsonConverter = new StandardConverter();
-        var_dump($token);
+        //echo $response;
         $token = $response;
         $serializer = new JSONFlattenedSerializer($jsonConverter);
 
         // We try to load the token.
         $jws = $serializer->unserialize($token);
         echo '<pre>' . var_export(json_decode($jws->getPayload()), true) . '</pre>';
-//        var_dump($jws);
+var_dump($token);
         $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);
     }
 }

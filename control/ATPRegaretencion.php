@@ -57,13 +57,13 @@ $payload = $jsonConverter->encode([
     'gestion' => 2019,
     'idEntidad' => 494,
     'idDa' => 15,
-    'nroPreventivo' => 2416,
+    'nroPreventivo' => 6680,
     'nroCompromiso' => 1,
     'nroDevengado' => 1,
     'nroPago' => 0,
     'nroSecuencia' => 0,
-    'acreedor' => 1,
-    'montoMo' => 0
+    'acreedor' => 327,
+    'montoMo' => 1
 ]);
 
 $jws = $jwsBuilder
@@ -89,7 +89,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:DeruXDVKO4GmwXCSHWVWfFz9h0gQ1lzLy9Lmdnd3pjN62z4ozTszW8hygo1oOCvWvna2O7Zgcpf5vFWvAranO8IEhTpm9NjM2l57",
+    CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:BuU1HJyDQglP72gTarqxsxUIPPWq29k57t2hExJTgqcNSFvhwgrHq2CRZSOiS1t1GEbBLZuIxuToOCj7gxt6w19TSqCQQCuMuM8f",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -121,7 +121,7 @@ if ($err) {
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egaretencion",
+        CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egaretencion",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,

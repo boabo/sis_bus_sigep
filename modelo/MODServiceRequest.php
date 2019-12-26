@@ -112,7 +112,8 @@ class MODServiceRequest extends MODbase{
 				ORDER BY exec_order";
 	    
 	    foreach ($link->query($sql) as $row) {
-	    	if ($row['json_main_container']) { 
+	    	if ($row['json_main_container']) {
+	    	    //var_dump('json:',$row['json_main_container']);
 	        	foreach ($json_obj[$row['json_main_container']] as $detail) {
 	        		$id_sigep_service_request = $this->insertaSigepServiceRequest($link,$id_service_request,$row['id_type_sigep_service_request'],$json_obj[$row['user_param']],$row['exec_order']);
 					$this->insertaParams($link,$id_sigep_service_request,$row['id_type_sigep_service_request'],$json_obj,$detail);
@@ -249,14 +250,28 @@ class MODServiceRequest extends MODbase{
 		$cone = new conexion();
         $link = $cone->conectarpdo();
 		$objRes = array();
-		
-		$sql = "SELECT id_service_request, status, last_message, last_message_revert 
+
+        /*$sql = "SELECT sr.status, sr.last_message_revert, ssr.last_message
+                  FROM sigep.tservice_request sr
+                    INNER JOIN sigep.tsigep_service_request ssr ON ssr.id_service_request = sr.id_service_request  
+                  WHERE ssr.last_message != '' AND sr.id_service_request = " . $this->arreglo['id_service_request'] ;*/
+
+		//envio de columnas de respuesta
+        /*$sql = "SELECT id_service_request, status, last_message, last_message_revert
 				FROM sigep.tservice_request sr 
-				WHERE sr.id_service_request = " . $this->arreglo['id_service_request'] ;
+				WHERE sr.id_service_request = " . $this->arreglo['id_service_request'] ;*/
+
+        $sql = "select sr.id_service_request, sr.status, ssr.last_message, sr.last_message_revert
+                from sigep.tservice_request sr
+                inner join sigep.tsigep_service_request ssr on ssr.id_service_request = sr.id_service_request  
+                where sr.id_service_request = ".$this->arreglo['id_service_request']."
+                group by sr.id_service_request, sr.status, ssr.last_message, sr.last_message_revert
+                order by ssr.last_message asc
+                limit 1" ;
 		
 		foreach ($link->query($sql) as $row) {
 			$objRes['status'] = $row['status'];
-			if ($row['status'] == 'success'){
+			if ($row['status'] == 'success' || $row['status'] == "" || $row['status'] == null){
 				$objRes['output'] = $this->getOutParams($link,$this->arreglo['id_service_request']);
 			} else {
 				$objRes['last_message'] = $row['last_message'];

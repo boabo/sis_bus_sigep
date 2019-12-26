@@ -50,7 +50,7 @@ if (isset($_POST['action'])) {
         $nroCompromiso = $_POST['nroCompromiso'];
         $nroDevengado= $_POST['nroDevengado'];
         $nroPago= $_POST['nroPago'];
-        $fecha = "13/05/2019";
+        $fecha = "10/07/2019";
 
     }
 }
@@ -68,7 +68,7 @@ if ($err) {
     $access_token = $token_response->{'access_token'};
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsclasificadores/api/v1/cuentabeneficiario?Beneficiario=819665&cuenta='10000002236532'",
+        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsclasificadores/api/v1/cuentabeneficiario?beneficiario=27118&cuenta='10000006158378'",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
