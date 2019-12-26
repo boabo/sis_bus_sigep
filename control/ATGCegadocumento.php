@@ -25,6 +25,7 @@ use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
+
     CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:dX3B7FYTXefL9n48XKZzl9rpORRyOu5YRDXZJnHMwdfVH12chEWxlnrwiJ7ynzQAMqDlPxFQjCQnK9PO6ksWIDBj4iHt8G74dbNt",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",

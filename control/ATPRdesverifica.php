@@ -81,6 +81,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
+
     CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:vmIGOk050ZEbb8afnwXRUad3jFoKotQjyl9aArcMf9v5OMHKPLkuY4YgtMysm0MUaqZD9feeUgVbm6rCiZk0yvvVcsnQW5GlNqr6",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",

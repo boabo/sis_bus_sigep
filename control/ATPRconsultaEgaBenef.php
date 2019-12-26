@@ -25,6 +25,7 @@ use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
+
     CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:vmIGOk050ZEbb8afnwXRUad3jFoKotQjyl9aArcMf9v5OMHKPLkuY4YgtMysm0MUaqZD9feeUgVbm6rCiZk0yvvVcsnQW5GlNqr6",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -44,7 +45,9 @@ $err = curl_error($curl);
 curl_close($curl);
 
 $vs = $_POST['type'];
+
 //var_dump('post que llega:', $response);
+
 
 if (isset($_POST['action'])) {
 
@@ -71,6 +74,7 @@ if ($err) {
     $access_token = $token_response->{'access_token'};
     $curl = curl_init();
     curl_setopt_array($curl, array(
+
         CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/$vs?gestion=2019&idEntidad=494&idDa=15&nroPreventivo=$nroPreventivo&nroCompromiso=$nroCompromiso&nroDevengado=$nroDevengado&nroPago=$nroPago&nroSecuencia=$nroSecuencia",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",

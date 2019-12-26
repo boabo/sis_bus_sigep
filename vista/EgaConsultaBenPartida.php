@@ -8,6 +8,7 @@
         <option value="egabeneficiario">Beneficiario</option>
         <option value="egacuentalibreta">Cuentas Libreta</option>
         <option value="egacuentacontable">Cuentas Contables</option>
+
     </select>
     <input type='hidden' name='action' value='register'>
     <table>

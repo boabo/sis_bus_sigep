@@ -57,14 +57,14 @@ $payload = $jsonConverter->encode([
     'nroPago' => 0,
     'nroSecuencia' => 0,
     'nroDevengadoSip' => 0,
-    'tipoFormulario' => "C",
+    'tipoFormulario' => "S",
     'tipoDocumento' => "O",
     'tipoEjecucion' => "N",
     'preventivo' => "S",
     'compromiso' => "S",
     'devengado' => "S",
     'pago' => "N",
-    'devengadoSip' => "N",
+    'devengadoSip' => "S",
     'pagoSip' => "N",
     "regularizacion"=> "N",
     "fechaElaboracion"=> "02/12/2019",
@@ -81,6 +81,7 @@ $payload = $jsonConverter->encode([
     "totalRetencionesMo"=> 200,
     "totalMultasMo"=> 0,
     "liquidoPagableMo"=> 800,
+
 ]);
 
 $jws = $jwsBuilder
@@ -106,6 +107,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
+
     CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:vmIGOk050ZEbb8afnwXRUad3jFoKotQjyl9aArcMf9v5OMHKPLkuY4YgtMysm0MUaqZD9feeUgVbm6rCiZk0yvvVcsnQW5GlNqr6",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",

@@ -3,6 +3,7 @@
 var_dump("authorization_code:", $_POST['authorization_code']);
 
 $code = $_POST['authorization_code'];
+
 define("CALLBACK_URL", "http://10.150.0.90/kerp/sis_sigep/control/ActionInitRefreshToken.php");
 define("AUTH_URL", "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/login.html");
 define("ACCESS_TOKEN_URL", "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token");
@@ -13,6 +14,7 @@ define("AUTH_URL", "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/login.html");
 define("ACCESS_TOKEN_URL", "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token");
 define("CLIENT_ID", "0");
 define("CLIENT_SECRET", "0");*/
+
 ////iFrame 4 URL to call
 $url = AUTH_URL."?"
     ."response_type=code"
@@ -71,6 +73,7 @@ include_once(dirname(__FILE__).'/../../lib/rest/PxpRestClient2.php');
 
 //Generamos el documento con REST
 
+
 $pxpRestClient = PxpRestClient2::connect('10.150.0.90', 'kerp/pxp/lib/rest/')->setCredentialsPxp('admin','admin');
 
 if(!empty($response['access_token'])||!empty($response['refresh_token'])|| !empty($response['expires_in'])) {
@@ -101,6 +104,7 @@ if(!empty($response['access_token'])||!empty($response['refresh_token'])|| !empt
 
 <script>
     console.log('valores', this)
+
     function funcion(){
         //window.close();
         alert('<?php echo 'work it!';?>');

@@ -78,6 +78,7 @@ $payload = $jsonConverter->encode([
     'fechaElaboracionRdo' => "02/12/2019",
     'fechaRecepcionRdo' => "02/12/2019",
     'fechaVencimientoRdo' => "02/12/2019"
+
 ]);
 
 
@@ -104,7 +105,11 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
+<<<<<<< HEAD
     CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:BuU1HJyDQglP72gTarqxsxUIPPWq29k57t2hExJTgqcNSFvhwgrHq2CRZSOiS1t1GEbBLZuIxuToOCj7gxt6w19TSqCQQCuMuM8f",
+=======
+    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:FIjmQpcjzzYNEjOD61rsQ8eYnlediCY9wDMOTvckiFdU1um1XeHXp8SWkaUkosISNQ7DP9HXfAipuRsXa7XVLe2CmWCwcPOL03BB",
+>>>>>>> e857001328f887b0d00f9a6b54133f31311602a7
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
