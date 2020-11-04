@@ -108,7 +108,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:2TbQHnMqtdwyNOGTjBLgiYCLyhgM6UXKyoM7ADIfUrmj6myFweTW0gp7IAVGyVXtOl9Dr9YIJZoDn7AmcGoG6pCOEadQQlttHz1D",
+  CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:2TbQHnMqtdwyNOGTjBLgiYCLyhgM6UXKyoM7ADIfUrmj6myFweTW0gp7IAVGyVXtOl9Dr9YIJZoDn7AmcGoG6pCOEadQQlttHz1D",
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   //CURLOPT_MAXREDIRS => 10,
@@ -140,7 +140,7 @@ if ($err) {
   	$curl = curl_init();
 
 	curl_setopt_array($curl, array(
-	  CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egadocumento",
+	  CURLOPT_URL => "https://sigep.sigma.gob.bo/ejecucion-gasto/api/v1/egadocumento",
 	  CURLOPT_RETURNTRANSFER => true,
 	  CURLOPT_ENCODING => "",
 	  CURLOPT_MAXREDIRS => 10,

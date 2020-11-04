@@ -312,7 +312,8 @@ Phx.vista.Param=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.Param.superclass.loadValoresIniciales.call(this);
     },
 	bdel:true,
-	bsave:true
+	bsave:true,
+    btest:false
 	}
 )
 </script>

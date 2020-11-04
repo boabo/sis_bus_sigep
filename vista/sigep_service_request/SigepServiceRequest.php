@@ -233,7 +233,8 @@ Phx.vista.SigepServiceRequest=Ext.extend(Phx.gridInterfaz,{
 	bdel:false,
 	bsave:false,
 	bnew:false,
-	bedit:false
+	bedit:false,
+    btest:false
 	}
 )
 </script>

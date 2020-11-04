@@ -48,10 +48,10 @@ $jwsBuilder = new JWSBuilder(
 
 // The payload we want to sign. The payload MUST be a string hence we use our JSON Converter.
 $payload = $jsonConverter->encode([
-    'gestion' => 2019,
+    'gestion' => 2020,
     'idEntidad' => 494,
     'idDa' => 15,
-    'nroPreventivo' => 7694,
+    'nroPreventivo' => -1,
     'nroCompromiso' => 1,
     'nroDevengado' => 1,
     'nroPago' => 0,
@@ -82,8 +82,7 @@ $curl = curl_init();
 
 curl_setopt_array($curl, array(
 
-    CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:BuU1HJyDQglP72gTarqxsxUIPPWq29k57t2hExJTgqcNSFvhwgrHq2CRZSOiS1t1GEbBLZuIxuToOCj7gxt6w19TSqCQQCuMuM8f",
-
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:x41m0E1CCYqcehdc6iYnZ10oFjeT8WI9cE53p6OmiUSxczFdwJseEZhpf4jpwYlS7E7x08IP7Xo2K0CJgPbKr9DvA6V8iKInkfV4",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -115,7 +114,7 @@ if ($err) {
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egadocumento",
+        CURLOPT_URL => "https://sigep.sigma.gob.bo/ejecucion-gasto/api/v1/egadocumento",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,

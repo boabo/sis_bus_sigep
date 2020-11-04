@@ -26,7 +26,7 @@ $curl = curl_init();
 
 curl_setopt_array($curl, array(
 
-    CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:vmIGOk050ZEbb8afnwXRUad3jFoKotQjyl9aArcMf9v5OMHKPLkuY4YgtMysm0MUaqZD9feeUgVbm6rCiZk0yvvVcsnQW5GlNqr6",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:BHiikfRP2pjJ6jxNbLxJrbOebAg5BQ3qVfgXOTk7oQJZ52Uzi2lcN7gck1Zn1t2yF8EMbz0iMmomxJmb0JCqBTyJzK5Z5X3VwNrZ",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -46,7 +46,7 @@ curl_close($curl);
 
 $vs = $_POST['type'];
 
-//var_dump('post que llega:', $response);
+//var_dump('post que llega:', $_POST['action'], $vs);
 
 
 if (isset($_POST['action'])) {
@@ -71,11 +71,11 @@ if ($err) {
      *
      **************************************************/
     $token_response = json_decode($response);
-    $access_token = $token_response->{'access_token'};
+    $access_token = $token_response->{'access_token'};//var_dump('post que llega:',$_POST, $_POST['action'], $vs, $access_token);exit;
     $curl = curl_init();
     curl_setopt_array($curl, array(
 
-        CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/$vs?gestion=2019&idEntidad=494&idDa=15&nroPreventivo=$nroPreventivo&nroCompromiso=$nroCompromiso&nroDevengado=$nroDevengado&nroPago=$nroPago&nroSecuencia=$nroSecuencia",
+        CURLOPT_URL => "https://sigep.sigma.gob.bo/ejecucion-gasto/api/v1/$vs?gestion=2020&idEntidad=494&idDa=15&nroPreventivo=$nroPreventivo&nroCompromiso=$nroCompromiso&nroDevengado=$nroDevengado&nroPago=$nroPago&nroSecuencia=$nroSecuencia",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,

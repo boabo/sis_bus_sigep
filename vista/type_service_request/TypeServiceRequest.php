@@ -202,7 +202,8 @@ Phx.vista.TypeServiceRequest=Ext.extend(Phx.gridInterfaz,{
 		  cls:'TypeSigepServiceRequest'
 	},
 	bdel:true,
-	bsave:true
+	bsave:true,
+    btest:false
 	}
 )
 </script>

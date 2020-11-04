@@ -1,12 +1,12 @@
 
 <?php
-var_dump("authorization_code:", $_POST['authorization_code']);
+//var_dump("authorization_code:", $_POST['authorization_code']);
 
-$code = $_POST['authorization_code'];
+$code = $_POST['authorization_code'];//var_dump('$code:', $code);exit;
 
-define("CALLBACK_URL", "http://10.150.0.90/kerp/sis_sigep/control/ActionInitRefreshToken.php");
-define("AUTH_URL", "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/login.html");
-define("ACCESS_TOKEN_URL", "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token");
+define("CALLBACK_URL", "http://172.17.58.62/kerp/sis_sigep/control/ActionInitRefreshToken.php");
+define("AUTH_URL", "https://sigep.sigma.gob.bo/rsseguridad/login.html");
+define("ACCESS_TOKEN_URL", "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token");
 define("CLIENT_ID", "0");
 define("CLIENT_SECRET", "0");
 /*define("CALLBACK_URL", "http://192.168.11.130/kerp/sis_sigep/control/ActionInitRefreshToken.php");
@@ -37,7 +37,7 @@ $params = array(
     CURLOPT_TIMEOUT => 30,
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_NOBODY => false,
+    //CURLOPT_NOBODY => false,
     CURLOPT_HTTPHEADER => array(
         "cache-control: no-cache",
         "content-type: application/x-www-form-urlencoded",
@@ -49,7 +49,7 @@ $params = array(
 curl_setopt_array($curl, $params);
 
 $response = curl_exec($curl);
-//var_dump('despues de curl:', $response);
+//var_dump('despues de curl:', $response);exit;
 $err = curl_error($curl);
 
 curl_close($curl);
@@ -74,7 +74,7 @@ include_once(dirname(__FILE__).'/../../lib/rest/PxpRestClient2.php');
 //Generamos el documento con REST
 
 
-$pxpRestClient = PxpRestClient2::connect('10.150.0.90', 'kerp/pxp/lib/rest/')->setCredentialsPxp('admin','admin');
+$pxpRestClient = PxpRestClient2::connect('172.17.58.62', 'kerp/pxp/lib/rest/')->setCredentialsPxp('admin','admin');
 
 if(!empty($response['access_token'])||!empty($response['refresh_token'])|| !empty($response['expires_in'])) {
     echo "<pre style='margin: 0px 0px 10px 0px; display: block; background: white; color: green; font-family: Verdana; border: 1px solid #cccccc; padding: 5px; font-size: 10px; line-height: 13px; align-content: center;'>";

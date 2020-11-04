@@ -250,7 +250,7 @@ Phx.vista.TypeSigepServiceRequest=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
-		{
+		/*{
 			config:{
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
@@ -263,8 +263,32 @@ Phx.vista.TypeSigepServiceRequest=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'tssr.estado_reg',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:false
-		},
+				form:true
+		},*/
+
+        {
+            config:{
+                name: 'estado_reg',
+                fieldLabel: 'Estado Reg.',
+                allowBlank: false,
+                emptyText:'Estado Reg...',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                anchor: '80%',
+                gwidth: 200,
+                store:['activo','inactivo']
+            },
+            type:'ComboBox',
+            filters:{
+                type: 'list',
+                options: ['activo','inactivo'],
+            },
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		
 		{
 			config:{
@@ -410,7 +434,8 @@ Phx.vista.TypeSigepServiceRequest=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.TypeSigepServiceRequest.superclass.loadValoresIniciales.call(this);
     },
 	bdel:true,
-	bsave:true
+	bsave:true,
+    btest:false
 	}
 )
 </script>

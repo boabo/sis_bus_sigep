@@ -25,7 +25,7 @@ use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=SCY485838000:lcS57IQZYaEeCq3apbPoSPuXflQW3AKmE6muBMNqnsAthzgZl0eZa7tvallzeCbVK9YKwQZaQlgf7Jp3OfAPxp3BBjUN8fniiiLw",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=SCY485838000:lcS57IQZYaEeCq3apbPoSPuXflQW3AKmE6muBMNqnsAthzgZl0eZa7tvallzeCbVK9YKwQZaQlgf7Jp3OfAPxp3BBjUN8fniiiLw",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -70,7 +70,7 @@ if ($err) {
     $curl = curl_init();
     curl_setopt_array($curl, array(
         //CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsbeneficiarios/api/v1/beneficiarios/natural?numeroDocumento=&primerApellido=ZABALA&segundoApellido=MITA&nombres=ROMER&fechaNacimiento=19-03-1984",
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rclasificadores/api/v1/libreta?fecha_consulta=".'11/09/2019'."&id_entidad=494",
+        CURLOPT_URL => "https://sigep.sigma.gob.bo/rclasificadores/api/v1/libreta?fecha_consulta=".'11/09/2019'."&id_entidad=494",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,

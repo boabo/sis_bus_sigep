@@ -25,7 +25,7 @@ use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:yH9XighrPKILG76yoQ4xWYMfjvpOQXXMfNEOsOTvyLMPy230CfOrQTESlJl76KvFSusgbgJj7fu2kM3Ze1KH94TVKJIos9czsKbq",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:yH9XighrPKILG76yoQ4xWYMfjvpOQXXMfNEOsOTvyLMPy230CfOrQTESlJl76KvFSusgbgJj7fu2kM3Ze1KH94TVKJIos9czsKbq",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -56,7 +56,7 @@ if ($err) {
     $access_token = $token_response->{'access_token'};
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/ejecucion-gasto/api/cola/ega_beneficiarios/" . $_GET["cola_id"],
+        CURLOPT_URL => "https://sigep.sigma.gob.bo/ejecucion-gasto/api/cola/ega_beneficiarios/" . $_GET["cola_id"],
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,

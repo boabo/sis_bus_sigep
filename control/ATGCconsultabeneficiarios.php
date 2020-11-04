@@ -23,10 +23,10 @@ use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
 
 
 $curl = curl_init();
-
+//var_dump('BENEFICIARIO');exit;
 curl_setopt_array($curl, array(
 
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=SCY485838000:DsC2N5irbAUWep1LoIwZmZzb45ZmX5mtUW4JSkVcQ8IDk9lNoiJjhAlmAm1imX3TuIOIXUm7254I94NYIHf1u8p4jlcrBXu8AQuU",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=FEA520426600:i2wL42wU748X9ZXIH75cNbmm6eChbdpXuWw2mUKJpDJeFjNIlR33DhCIlYVkPk22D9Ai2GUINGzEreZlmmwqInYkGXBcxhZscfxu",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -66,13 +66,13 @@ if ($err) {
      *
      **************************************************/
     $token_response = json_decode($response);
-    var_dump($token_response);
-    $access_token = $token_response->{'access_token'};
+    //var_dump('BENEF',$token_response);
+    $access_token = $token_response->{'access_token'};//var_dump($access_token);exit;
     $curl = curl_init();
     curl_setopt_array($curl, array(
 
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsbeneficiarios/api/v1/beneficiarios/natural?numeroDocumento=5793696&primerApellido=LLANOS&segundoApellido=HUANCA&fechaNacimiento=01-01-1982",
-        //CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsbeneficiarios/api/v1/beneficiarios/juridico?numeroDocumento=4512134014",
+        //CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsbeneficiarios/api/v1/beneficiarios/natural?numeroDocumento=5793696&primerApellido=LLANOS&segundoApellido=HUANCA&fechaNacimiento=01-01-1982",
+        CURLOPT_URL => "https://sigep.sigma.gob.bo/rsbeneficiarios/api/v1/beneficiarios/juridico?numeroDocumento=5225338013",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
@@ -121,7 +121,7 @@ if ($err) {
         $token = $response;
 
         $usus=json_decode($token, true);
-        var_dump('BENEFICIARIO:',$usus['data']['beneficiario']);
+        //var_dump('BENEFICIARIO:',$usus['data']['beneficiario']);
 
         echo '<pre>' . var_export(json_decode($token), true) . '</pre>';
 

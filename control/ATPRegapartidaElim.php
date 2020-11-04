@@ -48,15 +48,15 @@ $jwsBuilder = new JWSBuilder(
 
 // The payload we want to sign. The payload MUST be a string hence we use our JSON Converter.
 $payload = $jsonConverter->encode([
-    'gestion' => 2019,
-    'idEntidad' => 494  ,
-    'idDa' => 15,
-    'nroPreventivo' => 3957,
+    'idEntidad' => 494,
+    'nroPago' => 0,
+    'idPtogto' => 3725124,
+    'nroPreventivo' => 3908,
     'nroCompromiso' => 1,
     'nroDevengado' => 1,
-    'nroPago' => 0,
+    'idDa' => 15,
     'nroSecuencia' => 0,
-    'idPtogto' => 3108003
+    'gestion' => 2020
 ]);
 
 $jws = $jwsBuilder
@@ -82,7 +82,7 @@ $token = $serializer->serialize($jws, 0); // We serialize the signature at index
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:DeruXDVKO4GmwXCSHWVWfFz9h0gQ1lzLy9Lmdnd3pjN62z4ozTszW8hygo1oOCvWvna2O7Zgcpf5vFWvAranO8IEhTpm9NjM2l57",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:NujOSOWPHJjPgoiFtPlx3TIpDVxCeaxt1jg1by0ArwOmSJOB98NBeDX4WQlkQxq9ikZq5w3dtEyHsVUpCgn40fn7WDJvcPpQaBXI",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -110,11 +110,11 @@ if ($err) {
      *
      **************************************************/
     $token_response = json_decode($response);
-    $access_token = $token_response->{'access_token'};
+    $access_token = $token_response->{'access_token'};//var_dump('$access_token', $access_token);exit;
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egapartida",
+        CURLOPT_URL => "https://sigep.sigma.gob.bo/ejecucion-gasto/api/v1/egapartida",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,

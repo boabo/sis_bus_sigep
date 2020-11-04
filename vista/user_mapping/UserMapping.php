@@ -311,7 +311,8 @@ Phx.vista.UserMapping=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true
+	bsave:true,
+    btest:false
 	}
 )
 </script>

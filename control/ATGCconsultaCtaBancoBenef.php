@@ -25,7 +25,7 @@ use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACA561396900:dGU4KTOLNb5lVWpSPBMJZyWzLd75ylKyQNcRhisIHyVEUKSP1oyummSZ55fHewlvSyf5eE28rSJq9MXvLolokWtzyrNmqbOnZcOm",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACA561396900:dGU4KTOLNb5lVWpSPBMJZyWzLd75ylKyQNcRhisIHyVEUKSP1oyummSZ55fHewlvSyf5eE28rSJq9MXvLolokWtzyrNmqbOnZcOm",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -68,7 +68,7 @@ if ($err) {
     $access_token = $token_response->{'access_token'};
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsclasificadores/api/v1/cuentabeneficiario?beneficiario=27118&cuenta='10000006158378'",
+        CURLOPT_URL => "https://sigep.sigma.gob.bo/rsclasificadores/api/v1/cuentabeneficiario?beneficiario=27118&cuenta='10000006158378'",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,

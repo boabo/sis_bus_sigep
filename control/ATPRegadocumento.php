@@ -47,7 +47,7 @@ $jwsBuilder = new JWSBuilder(
 );
 
 // The payload we want to sign. The payload MUST be a string hence we use our JSON Converter.
-$payload = $jsonConverter->encode([
+/*$payload = $jsonConverter->encode([
     'gestion' => 2019,
     'idEntidad' => 494,
     'idDa' => 15,
@@ -82,7 +82,47 @@ $payload = $jsonConverter->encode([
     "totalMultasMo"=> 0,
     "liquidoPagableMo"=> 800,
 
+]);*/
+$payload = $jsonConverter->encode([
+    'gestion' => 2020,
+    'idEntidad' => 494,
+    'idDa' => 15,
+    'nroPreventivo' => 1,
+    'nroCompromiso' => 1,
+    'nroDevengado' => 1,
+    'nroPago' => 0,
+    'nroSecuencia' => 0,
+    'tipoFormulario' => 'C',
+    'tipoDocumento' => 'O',
+    'tipoEjecucion' => 'N',
+    'preventivo' => 'S',
+    'compromiso' => 'S',
+    'devengado' => 'S',
+    'pago' => 'N',
+    'devengadoSip' => 'N',
+    'pagoSip' => 'N',
+    'regularizacion' => 'N',
+    'fechaElaboracion' => '17/08/2020',
+    'claseGastoCip' => 4,
+    'claseGastoSip' => NULL,
+    "idCatpry" => null,
+    "sigade" => null,
+    "otfin" => null,
+    'resumenOperacion' => 'PARA REGISTRAR EL OP-CBB-PGD-5/17-2020 PARA REGISTRAR EL PAGO A SERVICIOS DE AEROPUERTOS
+BOLIVIANOS S.A. ̈SABSA ̈ POR SERVICIO DE ARRENDAMIENTO DE ESPACIOS EN AEROPUERTO JORGE WILSTERMANN, CORRESPONDIENTE A
+MAYO, SOLICITADO POR EL ENLACE DE G.DE OPERACIONES, SEGUN FACT. 11, 12,136 Y DOCUMENTOS ADJUNTOS. PCP-000462-2020 CUOTA
+5.,CBTE PCP-000462-2020, DE ACUERDO A DOCUMENTACIÓN ADJUNTA.',
+    'moneda' => 69,
+    'fechaTipoCambio' => '17/08/2020',
+    'compraVenta' => 'C',
+    'totalAutorizadoMo' => 50621.58,
+    'totalRetencionesMo' => 0.0,
+    'totalMultasMo' => 0.0,
+    'liquidoPagableMo' => 50621.58
+
 ]);
+
+
 
 $jws = $jwsBuilder
     ->create()                               // We want to create a new JWS
@@ -108,7 +148,7 @@ $curl = curl_init();
 
 curl_setopt_array($curl, array(
 
-    CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:vmIGOk050ZEbb8afnwXRUad3jFoKotQjyl9aArcMf9v5OMHKPLkuY4YgtMysm0MUaqZD9feeUgVbm6rCiZk0yvvVcsnQW5GlNqr6",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=EZQ885431300:XvZIe71n6F3wIuLjdceeUX2chlyaX3vs08PVzyd93DRFMFKGX8MTY9puhgsgTLbcF4lbhbnEXrZqaiNoI8VuUF0sDlkoAO8bkbB4",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,

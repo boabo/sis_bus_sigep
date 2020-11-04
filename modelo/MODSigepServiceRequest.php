@@ -20,6 +20,16 @@ use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
 class MODSigepServiceRequest extends MODbase{
     private $canceledServices = array();
+    /*begin franklin.espinoza*/
+    private $response_status = true;
+    private $end_process = true;
+    /*private $request_methods = array();
+    private $total_methods = 0;
+    private $total_services = 0;
+    private $sigep_status = '';*/
+    private $check_cycle = true;
+    /*end franklin.espinoza*/
+
     function __construct(CTParametro $pParam){
         parent::__construct($pParam);
     }
@@ -57,32 +67,86 @@ class MODSigepServiceRequest extends MODbase{
 
 
         //Ejecuta la instruccion
-        $this->armarConsulta();
+        $this->armarConsulta();//echo $this->consulta;exit;
         $this->ejecutarConsulta();
 
         //Devuelve la respuesta
         return $this->respuesta;
     }
 
-    function procesarServices() {
+    function procesarServices() {//var_dump(__DIR__);exit;
+
+        $estado_c31 = $this->objParam->getParametro('estado_c31');//var_dump('procesarServices',$estado_c31);exit;
+        $momento = $this->objParam->getParametro('momento');
         $cone = new conexion();
         $link = $cone->conectarpdo();
         $procesando = $this->verificarProcesamiento($link);
 
         if ($procesando == 'no') {
             $sql = "SELECT ssr.id_sigep_service_request,ssr.id_service_request,ssr.status,ssr.user_name,ssr.queue_id, ssr.queue_revert_id,tsr.sigep_url,tsr.method_type,
-					tsr.queue_url,tsr.queue_method,tsr.revert_url,tsr.revert_method,tsr.sigep_main_container 
+					tsr.queue_url,tsr.queue_method,tsr.revert_url,tsr.revert_method,tsr.sigep_main_container, tsr.require_change_perfil, tsr.sigep_service_name
 					FROM sigep.tsigep_service_request ssr 
 					JOIN sigep.ttype_sigep_service_request tsr ON tsr.id_type_sigep_service_request = ssr.id_type_sigep_service_request
 					WHERE ssr.estado_reg = 'activo' AND ssr.status IN ('next_to_execute','pending_queue','next_to_revert','pending_queue_revert')
 					ORDER BY ssr.id_service_request ASC, ssr.exec_order ASC";
             try {
-                foreach ($link->query($sql) as $row) {
-                    $this->procesarService($link,$row);
+                foreach ($record = $link->query($sql) as $row) {
+
+                    /*$this->total_services = $row['total_services'];
+                    $this->total_methods = count($this->request_methods);
+                    $this->sigep_status = $row['status'];*/
+                    if($row['sigep_service_name'] != 'verificaDoc' && $row['sigep_service_name'] != 'apruebaDoc' && $row['sigep_service_name'] != 'firmaDoc'){
+                        $this->check_cycle = false;
+                        $this->procesarService($link,$row);
+                    }
+
+
+                    /*begin franklin.espinoza 16/09/2020*/
+                    if($row['sigep_service_name'] == 'verificaDoc' || $row['sigep_service_name'] == 'apruebaDoc' || $row['sigep_service_name'] == 'firmaDoc'){
+                        if($momento == 'new'){
+                            $this->check_cycle = true;
+                        }else {
+                            if ($estado_c31 == 'elaborado' && $row['status'] == 'next_to_execute') {
+                                $this->check_cycle = false;
+                                $this->procesarService($link, $row);
+                            } else if ($estado_c31 == 'elaborado' && $row['status'] == 'pending_queue') {
+                                $this->procesarService($link, $row);
+                                $this->check_cycle = $this->response_status;
+                            } else if ($estado_c31 == 'verificado' && $row['status'] == 'next_to_revert') {
+                                $this->check_cycle = false;
+                                $this->procesarService($link, $row);
+                            } else if ($estado_c31 == 'verificado' && $row['status'] == 'pending_queue_revert') {
+                                $this->procesarService($link, $row);
+                                $this->check_cycle = $this->response_status;
+                            } else if ($estado_c31 == 'verificado' && $row['status'] == 'next_to_execute') {
+                                $this->check_cycle = false;
+                                $this->procesarService($link, $row);
+                            } else if ($estado_c31 == 'verificado' && $row['status'] == 'pending_queue') {
+                                $this->procesarService($link, $row);
+                                $this->check_cycle = $this->response_status;
+                            } else if ($estado_c31 == 'aprobado' && $row['status'] == 'next_to_execute') {
+                                $this->check_cycle = false;
+                                $this->procesarService($link, $row);
+                            } else if ($estado_c31 == 'aprobado' && $row['status'] == 'pending_queue') {
+                                $this->procesarService($link, $row);
+                                $this->check_cycle = $this->response_status;
+                            }
+                        }
+                    }
+                    /*end franklin.espinoza 16/09/2020*/
                 }
                 $this->modificaProcesamiento($link,'no');
+
+                if($this->check_cycle){
+                    $this->end_process = false;
+                }
+
                 $this->respuesta=new Mensaje();
-                $this->respuesta->setMensaje('EXITO',$this->nombre_archivo,'Procesamiento exitoso ','Procesamiento exitoso ','modelo',$this->nombre_archivo,'procesarServices','IME','');
+                $this->respuesta->setDatos(array(
+                    'end_process'    => $this->end_process
+                ));
+
+                $this->respuesta->setMensaje('EXITO',$this->nombre_archivo,'Procesamiento exitoso SIGEP','Procesamiento exitoso SIGEP','modelo',$this->nombre_archivo,'procesarServices','IME','');
             } catch (Exception $e) {
                 $this->modificaProcesamiento($link,'no');
                 $this->respuesta=new Mensaje();
@@ -125,29 +189,29 @@ class MODSigepServiceRequest extends MODbase{
     }
     function procesarService($link,$servicio){
         if (!in_array($servicio['id_service_request'], $this->canceledServices)) { //El servicio no fue cancelado
-            $accessToken = $this->getToken($link,$servicio['user_name']);
+
+            $accessToken = $this->getToken($link,$servicio['user_name']);//var_export($accessToken);exit;
             if ($accessToken == "0") { //ocurrio un error al generar el acces token
-                $this->serviceError($link,$servicio['id_sigep_service_request'],$servicio['id_service_request'],"Error al generar access token para el usuario: ".$servicio['user_name'],'si');
+                $this->serviceError($link,$servicio['id_sigep_service_request'],$servicio['id_service_request'],"Error al generar access token para el usuario: ".$servicio['user_name'],'si', 'token');
             } else {
                 if ($servicio['status'] == 'next_to_execute') {
-                    var_dump('metodo:', $servicio['method_type']);
                     $this->procesarSigep($link, $accessToken, $servicio['status'], $servicio['sigep_url'], $servicio['method_type'],
-                        $servicio['id_sigep_service_request'], $servicio['id_service_request']);
+                        $servicio['id_sigep_service_request'], $servicio['id_service_request'], '', $servicio['require_change_perfil']);
                 } else if ($servicio['status'] == 'pending_queue') {
                     $this->procesarSigep($link,$accessToken,$servicio['status'],$servicio['queue_url'],$servicio['queue_method'],
-                        $servicio['id_sigep_service_request'],$servicio['id_service_request'],$servicio['sigep_main_container']);
+                        $servicio['id_sigep_service_request'],$servicio['id_service_request'],$servicio['sigep_main_container'],$servicio['require_change_perfil']);
                 } else if ($servicio['status'] == 'next_to_revert') {
                     $this->procesarSigep($link,$accessToken,$servicio['status'],$servicio['revert_url'],$servicio['revert_method'],
-                        $servicio['id_sigep_service_request'],$servicio['id_service_request']);
+                        $servicio['id_sigep_service_request'],$servicio['id_service_request'], '', $servicio['require_change_perfil']);
 
                 } else if ($servicio['status'] == 'pending_queue_revert') {
                     $this->procesarSigep($link,$accessToken,$servicio['status'],$servicio['queue_url'],$servicio['queue_method'],
-                        $servicio['id_sigep_service_request'],$servicio['id_service_request'],$servicio['sigep_main_container']);
+                        $servicio['id_sigep_service_request'],$servicio['id_service_request'],$servicio['sigep_main_container'], $servicio['require_change_perfil']);
                 }
             }
         }
     }
-    function serviceError($link,$id_sigep_service_request,$id_service_request, $error,$fatal) {
+    function serviceError($link,$id_sigep_service_request,$id_service_request, $error,$fatal, $type) {
 
         $this->resetParametros();
 
@@ -157,10 +221,12 @@ class MODSigepServiceRequest extends MODbase{
         $this->arreglo['id_sigep_service_request'] = $id_sigep_service_request;
         $this->arreglo['error'] = $error;
         $this->arreglo['fatal'] = $fatal;
+        $this->arreglo['type_error'] = $type;
 
         $this->setParametro('id_sigep_service_request','id_sigep_service_request','integer');
         $this->setParametro('error','error','text');
         $this->setParametro('fatal','fatal','varchar');
+        $this->setParametro('type_error','type_error','varchar');
 
         $this->armarConsulta();
 
@@ -177,7 +243,7 @@ class MODSigepServiceRequest extends MODbase{
         }
     }
 
-    function procesarSigep ($link, $accessToken, $status, $url, $method, $id_sigep_service_request, $id_service_request, $sigep_container = '') {
+    function procesarSigep ($link, $accessToken, $status, $url, $method, $id_sigep_service_request, $id_service_request, $sigep_container = '', $require_change_perfil='no') {
 
         $algorithmManager = AlgorithmManager::create([
             new RS512(),
@@ -202,9 +268,39 @@ class MODSigepServiceRequest extends MODbase{
         //obtener parametros
         $params = $this->getInputParams($link, $id_sigep_service_request,$status);
         //var_dump('prueba parametros, url, metodo:', $params, $url, $method, $status);
+        //var_dump('respuesta decode:',$params, $accessToken, $url, $method);exit;
+        //var_dump($params, $require_change_perfil, $url, $method, $accessToken);exit;
+
+        if($require_change_perfil == 'si'){
+            $param_p = array("gestion" => "2020", "perfil" => "914");
+            $param_p = $jsonConverter->encode($param_p);
+            $curl_p = curl_init();
+
+            $curl_array_p = array(
+                CURLOPT_URL => 'https://sigep.sigma.gob.bo/rsbeneficiarios/api/cambiaperfil',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'PUT',
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: bearer " . $accessToken,
+                    "Cache-Control: no-cache",
+                    "Content-Type: application/json"
+                ),
+                CURLOPT_POSTFIELDS => $param_p
+            );
+
+            curl_setopt_array($curl_p,$curl_array_p);
+            $response_p = curl_exec($curl_p);
+            $err_p = curl_error($curl_p);
+            $http_code_p = curl_getinfo( $curl_p, CURLINFO_HTTP_CODE );
+            curl_close($curl_p);
+
+        }
 
         $curl = curl_init();
-
         $curl_array = array(
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
@@ -214,8 +310,8 @@ class MODSigepServiceRequest extends MODbase{
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_HTTPHEADER => array(
-                "authorization: bearer " . $accessToken,
-                "cache-control: no-cache"
+                "Authorization: bearer " . $accessToken,
+                "Cache-Control: no-cache"
             )
         );
         // The payload we want to sign. The payload MUST be a string hence we use our JSON Converter.
@@ -229,10 +325,12 @@ class MODSigepServiceRequest extends MODbase{
 
             $serializer = new JSONFlattenedSerializer($jsonConverter); // The serializer
             $token = $serializer->serialize($jws, 0); // We serialize the signature at index 0 (we only have one signature).
-            $curl_array[CURLOPT_POSTFIELDS] =  $token;
-            array_push($curl_array[CURLOPT_HTTPHEADER],"content-type: application/json");
 
-        } else {
+            $curl_array[CURLOPT_POSTFIELDS] = $token;//var_dump('$token',$token);exit;
+
+            array_push($curl_array[CURLOPT_HTTPHEADER],"Content-Type: application/json");
+
+        }else {
             if ($status == "pending_queue" || $status == 'pending_queue_revert') {
                 $curl_array[CURLOPT_URL] =  $url . "/" . $params;
 
@@ -243,16 +341,20 @@ class MODSigepServiceRequest extends MODbase{
         }
 
         curl_setopt_array($curl,$curl_array);
+
         $response = curl_exec($curl);
-        var_dump('respuesta decode:',$response);
+        //var_export($curl_array);
+        //var_export(curl_getinfo($curl));
+        //var_dump('response',$response, $method, $params);exit;
         $err = curl_error($curl);
         $http_code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
-        //var_dump('error decode:',$err);
+        //var_dump('error decode:',$err);exit;
 
         curl_close($curl);
 
         if ($err) {
-            $this->serviceError($link,$id_sigep_service_request,$id_service_request,"Error al ejecutar curl en sigep para status : $status ,archivo:MODSigepServiceRequest,  funcion: procesarSigep ",'si');
+            $this->request_status = false;
+            $this->serviceError($link,$id_sigep_service_request,$id_service_request,"Error al ejecutar curl en sigep para status : $status ,archivo:MODSigepServiceRequest,  funcion: procesarSigep ",'si', 'curl');
         } else {
             //DESSERIALIZAR MENSAJE
 
@@ -273,7 +375,7 @@ class MODSigepServiceRequest extends MODbase{
             // The JSON Converter.
             $jsonConverter = new StandardConverter();
             $token = $response;
-            //var_dump('token:',$token);
+            //var_dump('token:',isset($token), $token == null ,$token=='', is_null($token),  empty($token), !empty($token), empty($token='hola') );
 
             $serializer = new JSONFlattenedSerializer($jsonConverter);
 
@@ -281,39 +383,59 @@ class MODSigepServiceRequest extends MODbase{
             try {
                  if($method == 'GET' && $status == 'next_to_execute'){
                      $resObj = json_decode($token, true);
-                     //var_dump('token try:',$resObj);
                  }else {
-                     $jws = $serializer->unserialize($token);
-                     $resObj = json_decode($jws->getPayload(), true);
-                     //echo 'llego hasta resObj desserializar:', $resObj;
+                     if( !empty($token) ) {
+                         $jws = $serializer->unserialize($token);
+                         $resObj = json_decode($jws->getPayload(), true);
+                     }
                  }
-                /*$jws = $serializer->unserialize($token);
+                //var_dump('$resObj', $resObj);
+                 /*$jws = $serializer->unserialize($token);
                 $resObj = json_decode($jws->getPayload(), true);*/
 
-                if (isset($resObj['data']['errores'])|| $http_code == '500') {
-                    $this->serviceError($link,$id_sigep_service_request,$id_service_request, "MENSAJE:".$resObj['data']['errores'][0]['mensaje'].",CAUSA:".$resObj['data']['errores'][0]['causa'].",ACCION: ".$resObj['data']['errores'][0]['accion'],'no');
+                if (isset($resObj['data']['errores']) || $http_code == '500') {
+                    if( ($resObj['data']['errores'])[0]['mensaje'] != 'EGA-99999' ){
+                        //$this->procesarSigep ($link, $accessToken, $status, $url, $method, $id_sigep_service_request, $id_service_request, $sigep_container , $require_change_perfil);
+                        $this->serviceError($link, $id_sigep_service_request, $id_service_request, "MENSAJE:" . $resObj['data']['errores'][0]['mensaje'] . ",CAUSA:" . $resObj['data']['errores'][0]['causa'] . ",ACCION: " . $resObj['data']['errores'][0]['accion'], 'no', 'request ' . $http_code);
+                    }else{
+                        $this->response_status = false;
+                    }
                 } else if(isset($resObj['data']['C31']) && !is_array($resObj['data']['C31'])){
-                    $this->serviceError($link,$id_sigep_service_request,$id_service_request, $resObj['data']['C31'], 'no');
+                    $this->response_status = true;
+                    $this->serviceError($link,$id_sigep_service_request,$id_service_request, $resObj['data']['C31'], 'no', 'C31 '.$http_code);
                 } else {
+                    /*if( $this->total_services == 1 ){
+                        $this->end_process = false;
+                    }*/
+                    $this->response_status = true;
                     $this->registrarProcesoExitoso($link,$id_sigep_service_request,($sigep_container == '' ? $resObj['data']:$resObj['data'][$sigep_container]),$id_service_request);
                 }
 
             } catch (Exception $e) {
-                $this->serviceError($link,$id_sigep_service_request,$id_service_request,"Error al desserializar respuesta : ". $token,'si');
+                $this->response_status = true;
+                $this->serviceError($link,$id_sigep_service_request,$id_service_request,"Error al desserializar respuesta : ". $token,'si', 'unserialize');
             }
         }
     }
     function registrarProcesoExitoso($link,$id_sigep_service_request,$resObj,$id_service_request) {
+
+        /*begin franklin.espinoza 21/09/2020*/
+        $momento = $this->objParam->getParametro('momento');
+        /*end franklin.espinoza 21/09/2020*/
+
         $names = "";
         $values = "";
-        var_dump('datos resObj:', $resObj);
-        foreach($resObj as $key => $value)
-        {
-            $names .= $key."||";
-            $values .= $value . "||";
+
+        if( !is_null($resObj) ) {
+
+            foreach ($resObj as $key => $value) {
+                $names .= $key . "||";
+                $values .= $value . "||";
+            }
+            $names = substr($names, 0, -2);
+            $values = substr($values, 0, -2);
         }
-        $names = substr($names, 0, -2);
-        $values = substr($values, 0, -2);
+
         //var_dump('valores:', $values);exit;
         $this->resetParametros();
         $this->transaccion = 'SIG_SISSUCC_UPD';
@@ -322,27 +444,30 @@ class MODSigepServiceRequest extends MODbase{
         $this->arreglo['id_sigep_service_request'] = $id_sigep_service_request;
         $this->arreglo['names_output'] = $names;
         $this->arreglo['values_output'] = $values;
-        var_dump('valores:', $this->arreglo['values_output']);
-        var_dump('nombres:', $this->arreglo['names_output']);
+        $this->arreglo['momento'] = $momento;
+        //var_dump('valores:', $this->arreglo['values_output']);
+        //var_dump('nombres:', $this->arreglo['names_output']);
         $this->setParametro('id_sigep_service_request','id_sigep_service_request','integer');
         $this->setParametro('names_output','names_output','text');
         $this->setParametro('values_output','values_output','text');
+        $this->setParametro('momento','momento','text');
 
         $this->armarConsulta();
         $stmt = $link->prepare($this->consulta);
 
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        var_dump('resultado consulta:', $result);
+        //var_dump('resultado consulta:', $result);
 
         $resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
+        //$this->end_process = $resp_procedimiento['datos']['end_process'];
         if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
-            $this->serviceError($link,$id_sigep_service_request,$id_service_request,"Error al llamar a la transaccion : SIG_SISSUCC_UPD ,en archivo:MODSigepServiceRequest,  funcion: registrarProcesoExitoso ",'si');
+            $this->serviceError($link,$id_sigep_service_request,$id_service_request,"Error al llamar a la transaccion : SIG_SISSUCC_UPD ,en archivo:MODSigepServiceRequest,  funcion: registrarProcesoExitoso ",'si', 'transaccion');
         }
 
     }
     function getInputParams($link, $id_sigep_service_request,$status) {
-        var_dump('atributos:',$id_sigep_service_request, $status);
+        //var_dump('atributos:',$id_sigep_service_request, $status);
 
         if ($status == "next_to_execute" || $status == 'next_to_revert') {
             $res = array();
@@ -362,7 +487,7 @@ class MODSigepServiceRequest extends MODbase{
                     $res[$row['name']] = $row['value'];
                 }
             }
-            var_dump('next_to_execute data:',$res);
+            //var_dump('next_to_execute data:',$res);
             return $res;
 
         } else if ($status == "pending_queue" || $status == 'pending_queue_revert') {
@@ -374,7 +499,7 @@ class MODSigepServiceRequest extends MODbase{
             foreach ($link->query($sql) as $row) {
                 $res = $row['value'];
             }
-            var_dump('pending_queue data:',$res);
+            //var_dump('pending_queue data:',$res);
             return $res;
         }
 
@@ -400,7 +525,7 @@ class MODSigepServiceRequest extends MODbase{
                 $curl = curl_init();
 
                 curl_setopt_array($curl, array(
-                    CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=". $row['refresh_token'],
+                    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=". $row['refresh_token'],
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => "",
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
@@ -445,6 +570,273 @@ class MODSigepServiceRequest extends MODbase{
     function isJson($string) {
         json_decode($string);
         return (json_last_error() == JSON_ERROR_NONE);
+    }
+
+
+    /*{developer: franklin.espinoza, date:15/09/2020, description: "Elimina C31 Sistema Sigep"}*/
+    function setupSigepProcess(){ //var_dump('setupSigepProcess',$this->objParam->getParametro('json_data'));exit;
+
+
+        $id_service_request = $this->objParam->getParametro('id_service_request');
+        $cone = new conexion();
+        $link = $cone->conectarpdo();
+
+        $res = array();
+        $sql = "select par.name, par.value, par.ctype, sig.user_name
+                from sigep.tservice_request ser 
+                inner join sigep.tsigep_service_request sig on sig.id_service_request = ser.id_service_request
+                inner join sigep.trequest_param par on par.id_sigep_service_request = sig.id_sigep_service_request
+                inner join sigep.ttype_sigep_service_request tsig on tsig.id_type_sigep_service_request = sig.id_type_sigep_service_request
+                where ser.id_service_request = $id_service_request and par.input_output in ('input') and tsig.sigep_service_name = 'egaDocumento' 
+                      and par.name in ('gestion','idEntidad','idDa','nroPago','nroSecuencia',
+                      'tipoFormulario', 'tipoDocumento', 'tipoEjecucion', 'preventivo', 'compromiso', 'devengado', 'pago', 'devengadoSip', 'regularizacion', 
+                 'fechaElaboracion', 'moneda', 'totalAutorizadoMo', 'totalRetencionesMo', 'totalMultasMo', 'liquidoPagableMo',
+                 'compraVenta','fechaTipoCambio','claseGastoSip', 'claseGastoCip', 'devengadoSip', 'pagoSip')";
+
+
+        $user = '';
+        foreach ($link->query($sql) as $row) {
+            if ($row['value'] == 'NULL') {
+                $res[$row['name']] = NULL;
+            } else if ($row['ctype'] == 'NUMERIC') {
+                $res[$row['name']] = (float)$row['value'];
+            } else if ($row['ctype'] == 'INTEGER') {
+                $res[$row['name']] = (int)$row['value'];
+            } else {
+                $res[$row['name']] = $row['value'];
+            }
+            $user = $row['user_name'];
+        }
+
+        $res['nroPreventivo'] = $this->objParam->getParametro('preventivo');;
+        $res['nroCompromiso'] = $this->objParam->getParametro('compromiso');;
+        $res['nroDevengado'] = $this->objParam->getParametro('devengado');;
+        $clase_gasto = $this->objParam->getParametro('clase_comprobante');
+        //$res['nroDevengadoSip'] = 0;
+        /*if($clase_gasto == 5){
+            $res['pagoSip'] = 'S';
+        }else{
+            $res['pagoSip'] = 'N';
+        }*/
+
+        $res['idCatpry'] = NULL;
+        $res['sigade'] = NULL;
+        $res['otfin'] = NULL;
+        $res['resumenOperacion'] = $this->objParam->getParametro('json_data');
+        //var_dump($res);exit;
+        $algorithmManager = AlgorithmManager::create([
+            new RS512(),
+        ]);
+
+        $jwk = JWKFactory::createFromKeyFile(
+            __DIR__ . '/../boa.key', // The filename
+            null,                   // Secret if the key is encrypted
+            [
+                'use' => 'sig',         // Additional parameters
+                'kid' => 'boaws'
+            ]
+        );
+
+        $jsonConverter = new StandardConverter();
+
+        // We instantiate our JWS Builder.
+        $jwsBuilder = new JWSBuilder(
+            $jsonConverter,
+            $algorithmManager
+        );
+        //obtener parametros
+        $params = $res;
+        $url = 'https://sigep.sigma.gob.bo/ejecucion-gasto/api/v1/egadocumento';
+        $accessToken = $this->getToken($link,$user);
+        $method = 'PUT';
+
+        //var_dump('setupSigepProcess', $params, $accessToken);exit;
+        $curl = curl_init();
+        $curl_array = array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => $method,
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: bearer " . $accessToken,
+                "Cache-Control: no-cache"
+            )
+        );
+        // The payload we want to sign. The payload MUST be a string hence we use our JSON Converter.
+        if ($method != 'GET') {
+            $payload = $jsonConverter->encode($params);
+            $jws = $jwsBuilder
+                ->create()                               // We want to create a new JWS
+                ->withPayload($payload)                  // We set the payload
+                ->addSignature($jwk, ['alg' => 'RS512'],['kid' => 'boaws']) // We add a signature with a simple protected header
+                ->build();
+
+            $serializer = new JSONFlattenedSerializer($jsonConverter); // The serializer
+            $token = $serializer->serialize($jws, 0); // We serialize the signature at index 0 (we only have one signature).
+
+            $curl_array[CURLOPT_POSTFIELDS] = $token;//var_dump('$token',$token);exit;
+
+            array_push($curl_array[CURLOPT_HTTPHEADER],"Content-Type: application/json");
+
+        }
+
+        curl_setopt_array($curl,$curl_array);
+        $response = curl_exec($curl);
+
+        //$response_info = curl_getinfo($curl);
+        //var_export($response_info['http_code']);
+        //var_dump('response',$response);
+
+        $err = curl_error($curl);
+        $http_code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
+        curl_close($curl);
+
+        //var_dump('error decode:',$err, $http_code);
+
+
+
+        $algorithmManager = AlgorithmManager::create([
+            new RS512()
+        ]);
+
+        // We instantiate our JWS Verifier.
+        $jwsVerifier = new JWSVerifier(
+            $algorithmManager
+        );
+        $jwk = JWKFactory::createFromKeyFile(
+            __DIR__ . '/../boa.key', // The filename
+            null
+        );
+
+        // The JSON Converter.
+        $jsonConverter = new StandardConverter();
+        $token = $response;
+        //var_dump('token:',isset($token), $token == null ,$token=='', is_null($token),  empty($token), !empty($token), empty($token='hola') );
+
+        $serializer = new JSONFlattenedSerializer($jsonConverter);
+
+
+        if( !empty($token) ) {
+            $jws = $serializer->unserialize($token);
+            $resObj = json_decode($jws->getPayload(), true);
+        }
+
+        //var_dump('resObj', $resObj);exit;
+
+
+
+        if ($err) {
+            $this->request_status = false;
+            /*$this->serviceError($link,$id_sigep_service_request,$id_service_request,"Error al ejecutar curl en sigep para status : $status ,archivo:MODSigepServiceRequest,  funcion: procesarSigep ",'si', 'curl');*/
+        } else {
+            /*//DESSERIALIZAR MENSAJE
+
+            // The algorithm manager with the HS256 algorithm.
+            $algorithmManager = AlgorithmManager::create([
+                new RS512()
+            ]);
+
+            // We instantiate our JWS Verifier.
+            $jwsVerifier = new JWSVerifier(
+                $algorithmManager
+            );
+            $jwk = JWKFactory::createFromKeyFile(
+                __DIR__ . '/../boa.key', // The filename
+                null
+            );
+
+            // The JSON Converter.
+            $jsonConverter = new StandardConverter();
+            $token = $response;
+
+
+            $serializer = new JSONFlattenedSerializer($jsonConverter);
+
+            // We try to load the token.
+            try {
+                if($method == 'GET' && $status == 'next_to_execute'){
+                    $resObj = json_decode($token, true);
+                }else {
+                    if( !empty($token) ) {
+                        $jws = $serializer->unserialize($token);
+                        $resObj = json_decode($jws->getPayload(), true);
+                    }
+                }
+
+
+                if (isset($resObj['data']['errores']) || $http_code == '500') {
+                    if( ($resObj['data']['errores'])[0]['mensaje'] != 'EGA-99999' ){
+
+                        $this->serviceError($link, $id_sigep_service_request, $id_service_request, "MENSAJE:" . $resObj['data']['errores'][0]['mensaje'] . ",CAUSA:" . $resObj['data']['errores'][0]['causa'] . ",ACCION: " . $resObj['data']['errores'][0]['accion'], 'no', 'request ' . $http_code);
+                    }else{
+                        $this->response_status = false;
+                    }
+                } else if(isset($resObj['data']['C31']) && !is_array($resObj['data']['C31'])){
+                    $this->response_status = true;
+                    $this->serviceError($link,$id_sigep_service_request,$id_service_request, $resObj['data']['C31'], 'no', 'C31 '.$http_code);
+                } else {
+
+                    $this->response_status = true;
+                    $this->registrarProcesoExitoso($link,$id_sigep_service_request,($sigep_container == '' ? $resObj['data']:$resObj['data'][$sigep_container]),$id_service_request);
+                }
+
+            } catch (Exception $e) {
+                $this->response_status = true;
+                $this->serviceError($link,$id_sigep_service_request,$id_service_request,"Error al desserializar respuesta : ". $token,'si', 'unserialize');
+            }*/
+        }
+
+        $response_status = false;
+        if($http_code == 200){
+            $response_status = true;
+        }
+
+        $this->respuesta=new Mensaje();
+        $this->respuesta->setDatos(array(
+            'response_status' => $response_status,
+            'idCola' => $resObj['data']['idCola'],
+            'http_code' => $http_code
+        ));
+        if($response_status){
+            $this->respuesta->setMensaje('EXITO', $this->nombre_archivo, 'Procesamiento exitoso SIGEP', 'Procesamiento exitoso SIGEP', 'modelo', $this->nombre_archivo, 'setupSigepProcess', 'IME', '');
+        }else{
+            $this->respuesta->setMensaje('FALLA', $this->nombre_archivo, 'Procesamiento fallido SIGEP', 'Procesamiento fallido SIGEP', 'modelo', $this->nombre_archivo, 'setupSigepProcess', 'IME', '');
+        }
+        return $this->respuesta;
+    }
+
+    function getCustomInputParams() {
+
+        $cone = new conexion();
+        $link = $cone->conectarpdo();
+
+            $res = array();
+            $sql = "select par.name, par.value, par.ctype, sig.user_name
+                    from sigep.tservice_request ser 
+                    inner join sigep.tsigep_service_request sig on sig.id_service_request = ser.id_service_request
+                    inner join sigep.trequest_param par on par.id_sigep_service_request = sig.id_sigep_service_request
+                    inner join sigep.ttype_sigep_service_request tsig on tsig.id_type_sigep_service_request = sig.id_type_sigep_service_request
+                    where ser.id_service_request = 180 and par.input_output in ('input', 'output') and tsig.sigep_service_name = 'egaDocumento' 
+                    and par.name in ('gestion','idEntidad','idDa','nroCompromiso','nroDevengado','nroPago','nroSecuencia')";
+
+            $res = $link->query($sql);
+            var_dump('getCustomInputParams',$res);exit;
+            foreach ($link->query($sql) as $row) {
+                if ($row['value'] == 'NULL') {
+                    $res[$row['name']] = NULL;
+                } else if ($row['ctype'] == 'NUMERIC') {
+                    $res[$row['name']] = (float)$row['value'];
+                } else if ($row['ctype'] == 'INTEGER') {
+                    $res[$row['name']] = (int)$row['value'];
+                } else {
+                    $res[$row['name']] = $row['value'];
+                }
+            }
+            //var_dump('next_to_execute data:',$res);
+            return $res;
     }
 
 }

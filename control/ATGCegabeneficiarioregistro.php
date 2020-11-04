@@ -27,7 +27,7 @@ $curl = curl_init();
 
 curl_setopt_array($curl, array(
 
-    CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=ACM372006900:BuU1HJyDQglP72gTarqxsxUIPPWq29k57t2hExJTgqcNSFvhwgrHq2CRZSOiS1t1GEbBLZuIxuToOCj7gxt6w19TSqCQQCuMuM8f",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=EZQ885431300:XvZIe71n6F3wIuLjdceeUX2chlyaX3vs08PVzyd93DRFMFKGX8MTY9puhgsgTLbcF4lbhbnEXrZqaiNoI8VuUF0sDlkoAO8bkbB4",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -58,7 +58,7 @@ if ($err) {
     $access_token = $token_response->{'access_token'};
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "https://sigeppruebas-wl12.sigma.gob.bo/ejecucion-gasto/api/cola/ega_beneficiarios/" . $_GET["cola_id"],
+        CURLOPT_URL => "https://sigep.sigma.gob.bo/ejecucion-gasto/api/cola/ega_beneficiarios/" . $_GET["cola_id"],
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,

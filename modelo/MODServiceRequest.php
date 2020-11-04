@@ -49,7 +49,7 @@ class MODServiceRequest extends MODbase{
 	}
 			
 	function insertarServiceRequest(){
-	    //var_dump('insertarServiceRequest');exit;
+	    //var_dump('insertarServiceRequest',  $this->aParam->_json_decode($this->aParam->getParametro('json')));exit;
 		$cone = new conexion();
         $link = $cone->conectarpdo();
                    
@@ -128,7 +128,7 @@ class MODServiceRequest extends MODbase{
 	}
 	
 	function insertaSigepServiceRequest($link,$id_service_request,$id_type_sigep_service_request,$user,$exec_order) {
-		$this->resetParametros();	
+		$this->resetParametros();
 		$this->transaccion = 'SIG_SISERE_INS';	
 		$this->procedimiento = 'sigep.ft_sigep_service_request_ime';            
         $this->tipo_procedimiento = 'IME';	
@@ -271,7 +271,7 @@ class MODServiceRequest extends MODbase{
 		
 		foreach ($link->query($sql) as $row) {
 			$objRes['status'] = $row['status'];
-			if ($row['status'] == 'success' || $row['status'] == "" || $row['status'] == null){
+			if ($row['status'] == 'success' || $row['status'] == 'pending' || $row['status'] == "" || $row['status'] == null){
 				$objRes['output'] = $this->getOutParams($link,$this->arreglo['id_service_request']);
 			} else {
 				$objRes['last_message'] = $row['last_message'];
@@ -316,6 +316,79 @@ class MODServiceRequest extends MODbase{
 		return $res;
 		
 	}
+
+    /*{developer: franklin.espinoza, date:15/09/2020, description: "Elimina C31 Sistema Sigep"}*/
+    function revertirProcesoSigep(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='sigep.ft_service_request_ime';
+        $this->transaccion='SIG_REVERT_STATUS';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_service_request','id_service_request','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    /*{developer: franklin.espinoza, date:15/09/2020, description: "Elimina C31 Sistema Sigep"}*/
+    function readyProcesoSigep(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='sigep.ft_service_request_ime';
+        $this->transaccion='SIG_READY_C31';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_service_request','id_service_request','int4');
+        $this->setParametro('direction','direction','varchar');
+        $this->setParametro('estado_reg','estado_reg','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta(); //echo $this->consulta; exit;
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    /*{developer: franklin.espinoza, date:15/09/2020, description: "Elimina C31 Sistema Sigep"}*/
+    function setupSigepProcess(){
+        $cone = new conexion();
+        $link = $cone->conectarpdo();
+
+        $res = array();
+        $sql = "select par.name, par.value, par.ctype, sig.user_name
+                from sigep.tservice_request ser 
+                inner join sigep.tsigep_service_request sig on sig.id_service_request = ser.id_service_request
+                inner join sigep.trequest_param par on par.id_sigep_service_request = sig.id_sigep_service_request
+                inner join sigep.ttype_sigep_service_request tsig on tsig.id_type_sigep_service_request = sig.id_type_sigep_service_request
+                where ser.id_service_request = 180 and par.input_output in ('revert') and tsig.sigep_service_name = 'cuentaLibreta'";
+
+
+        $user = '';
+        foreach ($link->query($sql) as $row) {
+            if ($row['value'] == 'NULL') {
+                $res[$row['name']] = NULL;
+            } else if ($row['ctype'] == 'NUMERIC') {
+                $res[$row['name']] = (float)$row['value'];
+            } else if ($row['ctype'] == 'INTEGER') {
+                $res[$row['name']] = (int)$row['value'];
+            } else {
+                $res[$row['name']] = $row['value'];
+            }
+            $user = $row['user_name'];
+        }
+        $res['user_name'] = $user;
+        var_dump('getCustomInputParams', $res);
+        unset($res['user_name']);
+        var_dump('Despues de borrar', $res);
+        exit;
+    }
+
 			
 }
 ?>

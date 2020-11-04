@@ -25,7 +25,7 @@ class ACTServiceRequest extends ACTbase{
 	}
 				
 	function insertarServiceRequest(){
-		$this->objFunc=$this->create('MODServiceRequest');	
+		$this->objFunc=$this->create('MODServiceRequest');
 		$this->res=$this->objFunc->insertarServiceRequest($this->objParam);	
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
@@ -37,10 +37,31 @@ class ACTServiceRequest extends ACTbase{
 	}
 						
 	function eliminarServiceRequest(){
-		$this->objFunc=$this->create('MODServiceRequest');	
+		$this->objFunc=$this->create('MODServiceRequest');
 		$this->res=$this->objFunc->eliminarServiceRequest($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+    /*{developer: franklin.espinoza, date:15/09/2020, description: "Elimina C31 Sistema Sigep"}*/
+    function revertirProcesoSigep(){
+        $this->objFunc=$this->create('MODServiceRequest');
+        $this->res=$this->objFunc->revertirProcesoSigep($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    /*{developer: franklin.espinoza, date:15/09/2020, description: "Verifica C31 Sistema Sigep"}*/
+    function readyProcesoSigep(){ //var_dump('valores', $this->objParam->getParametro('id_service_request'), $this->objParam->getParametro('direction'), $this->objParam->getParametro('momento'));exit;
+        $this->objFunc=$this->create('MODServiceRequest');
+        $this->res=$this->objFunc->readyProcesoSigep($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    /*{developer: franklin.espinoza, date:15/09/2020, description: "Verifica C31 Sistema Sigep"}*/
+    function setupSigepProcess(){ //var_dump('valores', $this->objParam->getParametro('id_service_request'), $this->objParam->getParametro('direction'), $this->objParam->getParametro('momento'));exit;
+        $this->objFunc=$this->create('MODServiceRequest');
+        $this->res=$this->objFunc->setupSigepProcess($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 			
 }
 

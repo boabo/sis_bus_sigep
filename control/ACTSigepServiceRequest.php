@@ -15,6 +15,7 @@ class ACTSigepServiceRequest extends ACTbase{
 			$this->objParam->addFiltro("ssr.id_service_request = ". $this->objParam->getParametro('id_service_request'));
 		}
 		$this->objParam->defecto('dir_ordenacion','asc');
+		//var_dump($this->objParam->getParametro('tipoReporte'), $this->objParam->getParametro('id_service_request'));exit;
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODSigepServiceRequest','listarSigepServiceRequest');
@@ -30,6 +31,13 @@ class ACTSigepServiceRequest extends ACTbase{
 		$this->res=$this->objFunc->procesarServices($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+    /*{developer: franklin.espinoza, date:15/09/2020, description: "Verifica C31 Sistema Sigep"}*/
+    function setupSigepProcess(){
+        $this->objFunc=$this->create('MODSigepServiceRequest');
+        $this->res=$this->objFunc->setupSigepProcess($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 			
 }
 

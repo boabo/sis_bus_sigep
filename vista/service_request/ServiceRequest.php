@@ -29,7 +29,8 @@ Phx.vista.ServiceRequest=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_service_request'
 			},
 			type:'Field',
-			form:true 
+			form:true,
+            grid: true
 		},
 		{
 			config:{
@@ -218,7 +219,8 @@ Phx.vista.ServiceRequest=Ext.extend(Phx.gridInterfaz,{
 	bdel:false,
 	bsave:false,
 	bnew:false,
-	bedit:false
+	bedit:false,
+    btest:false
 	}
 )
 </script>

@@ -25,7 +25,7 @@ use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:2TbQHnMqtdwyNOGTjBLgiYCLyhgM6UXKyoM7ADIfUrmj6myFweTW0gp7IAVGyVXtOl9Dr9YIJZoDn7AmcGoG6pCOEadQQlttHz1D",
+  CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:2TbQHnMqtdwyNOGTjBLgiYCLyhgM6UXKyoM7ADIfUrmj6myFweTW0gp7IAVGyVXtOl9Dr9YIJZoDn7AmcGoG6pCOEadQQlttHz1D",
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   //CURLOPT_MAXREDIRS => 10,
@@ -57,7 +57,7 @@ if ($err) {
   	$curl = curl_init();
 
 	curl_setopt_array($curl, array(
-	  CURLOPT_URL => "http://sigeppre-wl12.sigma.gob.bo/ejecucion-gasto/api/v1/egaconsulta?gestion=2018&idEntidad=494&idDa=15&nroPreventivo=1088&nroCompromiso=1&nroDevengado=1&nroPago=0&nroSecuencia=0&usuario=HSA373987300",
+	  CURLOPT_URL => "https://sigep.sigma.gob.bo/ejecucion-gasto/api/v1/egaconsulta?gestion=2018&idEntidad=494&idDa=15&nroPreventivo=1088&nroCompromiso=1&nroDevengado=1&nroPago=0&nroSecuencia=0&usuario=HSA373987300",
 	  CURLOPT_RETURNTRANSFER => true,
 	  CURLOPT_ENCODING => "",
 	  CURLOPT_MAXREDIRS => 10,
