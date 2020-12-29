@@ -152,6 +152,7 @@ BEGIN
                 set access_token = v_parametros.access_token,
                 	refresh_token = v_parametros.refresh_token,
                     expires_in = v_parametros.expires_in,
+                    authorization_code = v_parametros.authorization_code,
                     date_issued_rt = now(),
                     date_issued_at = now(),
                     id_usuario_mod = p_id_usuario,
@@ -170,6 +171,7 @@ BEGIN
                 date_issued_rt,
                 refresh_token,
                 access_token,
+                authorization_code,
                 expires_in,
                 sigep_user
                 ) values(
@@ -184,6 +186,7 @@ BEGIN
                 now(),
                 v_parametros.refresh_token,
                 v_parametros.access_token,
+                v_parametros.authorization_code,
                 v_parametros.expires_in,
                 split_part(v_parametros.refresh_token, ':', 1)
                 )RETURNING id_user_mapping into v_id_user_mapping;

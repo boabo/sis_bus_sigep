@@ -39,7 +39,8 @@ class MODServiceRequest extends MODbase{
 		$this->captura('service_code','varchar');
 		$this->captura('description','text');
 		$this->captura('last_message_revert','text');
-		
+		$this->captura('documento_c31','varchar');
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -81,7 +82,7 @@ class MODServiceRequest extends MODbase{
             $respuesta = $resp_procedimiento['datos'];
 
             
-            $id_service_request = $respuesta['id_service_request'];
+            $id_service_request = $respuesta['id_service_request'];//var_dump('$id_service_request', $id_service_request, $this->aParam->getParametro('service_code'),$jsonOb);exit;
 			
 			$this->insertaSigepServices($link,$id_service_request,$this->aParam->getParametro('service_code'),$jsonOb);
 			$link->commit();
@@ -104,7 +105,7 @@ class MODServiceRequest extends MODbase{
         return $this->respuesta;
 	}
 	
-	function insertaSigepServices($link,$id_service_request,$service_code,$json_obj) {
+	function insertaSigepServices($link,$id_service_request,$service_code,$json_obj) {//var_dump('parametros', $id_service_request,$service_code,$json_obj);exit;
 		$sql = "SELECT id_type_sigep_service_request, exec_order, json_main_container, user_param 
 				FROM sigep.ttype_sigep_service_request ssr 
 				JOIN sigep.ttype_service_request sr ON sr.id_type_service_request = ssr.id_type_service_request 

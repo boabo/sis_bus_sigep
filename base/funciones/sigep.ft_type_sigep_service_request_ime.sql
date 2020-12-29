@@ -125,7 +125,8 @@ BEGIN
 			revert_url = v_parametros.revert_url,
 			revert_method = v_parametros.revert_method,
 			user_param = v_parametros.user_param,
-			json_main_container = v_parametros.json_main_container
+			json_main_container = v_parametros.json_main_container,
+            estado_reg = v_parametros.estado_reg
 			where id_type_sigep_service_request=v_parametros.id_type_sigep_service_request;
 
 			--Definicion de la respuesta
@@ -150,6 +151,9 @@ BEGIN
 			--Sentencia de la eliminacion
 			delete from sigep.ttype_sigep_service_request
             where id_type_sigep_service_request=v_parametros.id_type_sigep_service_request;
+
+            delete from sigep.trequest_param
+			where id_sigep_service_request in (select id_sigep_service_request from sigep.tsigep_service_request where id_type_sigep_service_request = v_parametros.id_type_sigep_service_request);
 
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Sigep service request eliminado(a)');

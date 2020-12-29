@@ -226,11 +226,19 @@ Phx.vista.SigepServiceRequest=Ext.extend(Phx.gridInterfaz,{
 		field: 'ssr.exec_order',
 		direction: 'ASC'
 	},
+
+    east:{
+        url:'../../../sis_sigep/vista/request_param/RequestParam.php',
+        title:'Request Params ',
+        width:'50%',
+        cls:'RequestParam'
+    },
+
 	onReloadPage:function(m){
 		this.maestro=m;			
 		this.load({params:{start:0, limit:this.tam_pag,id_service_request:this.maestro.id_service_request}});			
 	},
-	bdel:false,
+	bdel:true,
 	bsave:false,
 	bnew:false,
 	bedit:false,

@@ -26,7 +26,7 @@ $curl = curl_init();
 
 curl_setopt_array($curl, array(
 
-    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=VSP287888200:5wUXdRB9NwbtLnsM0EOzpmWYxcDP8tC2UiyDIJk24JeR7fSVnfYVMsRVeCox1U26RhL2MAiSsPTaGyVZQZmMFPdtKyJrS8LvFIZe",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:LC7PzrSKB9sYg3tZx8ZRnR5bGcGQxd4SIU0Cmpl4N1bDTjjb9dkz4wgQr2tIWeqJjV9HChcUYrjBHaVAjjQv2uVAlz0z4RYeAwym",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,

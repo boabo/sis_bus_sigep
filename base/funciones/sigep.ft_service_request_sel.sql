@@ -62,7 +62,18 @@ BEGIN
 						usu2.cuenta as usr_mod,
 						tsr.service_code,
 						tsr.description,
-						sere.last_message_revert
+						sere.last_message_revert,
+                        (
+                          select pxp.list(trp.value)
+                          from sigep.tsigep_service_request tssr
+
+                          inner join sigep.ttype_sigep_service_request ttsr on ttsr.id_type_sigep_service_request = tssr.id_type_sigep_service_request
+                          inner join sigep.ttype_service_request sr on sr.id_type_service_request = ttsr.id_type_service_request
+                          inner join sigep.trequest_param trp on trp.id_sigep_service_request = tssr.id_sigep_service_request
+                          where tssr.id_service_request = sere.id_service_request and ttsr.sigep_service_name = ''egaDocumento''
+                          and trp.name in (''nroPreventivo'',''nroCompromiso'',''nroDevengado'') and trp.input_output = ''output''
+                          group by  ttsr.sigep_service_name
+                        )::varchar as documento_c31
 						from sigep.tservice_request sere
 						inner join segu.tusuario usu1 on usu1.id_usuario = sere.id_usuario_reg
 						inner join sigep.ttype_service_request tsr on tsr.id_type_service_request = sere.id_type_service_request

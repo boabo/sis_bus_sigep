@@ -16,9 +16,108 @@ Phx.vista.ServiceRequest=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.ServiceRequest.superclass.constructor.call(this,config);
-		this.init();
+
+        this.addButton('btnreenviar', {
+            //grupo: [0],
+            text: 'Eliminar C31',
+            iconCls: 'breload2',
+            disabled: false,
+            handler:this.onRevertirC31,
+            tooltip: '<b>Eliminar C31</b><br/>Envia solicitud para eliminar Documento Sigep'
+        });
+
+
+        this.init();
 		this.load({params:{start:0, limit:this.tam_pag}})
 	},
+
+    onRevertirC31: function (){
+
+        Ext.Msg.show({
+            title: 'Eliminar Documento C31',
+            msg: '<b style="color: red;">Esta seguro de eliminar el Documento C31 SIGEP.</b>',
+            fn: function (btn){
+                if(btn == 'ok'){
+                    var record = this.getSelectedData();
+                    Phx.CP.loadingShow();
+
+                    Ext.Ajax.request({
+                        url:'../../sis_sigep/control/ServiceRequest/revertirProcesoSigep',
+                        params:{
+                            id_service_request : record.id_service_request
+                        },
+                        success: this.procesarEstadoRevertidoC31,
+                        failure: this.conexionFailure,
+                        timeout: this.timeout,
+                        scope:this
+                    });
+                }
+            },
+            buttons: Ext.Msg.OKCANCEL,
+            width: 350,
+            maxWidth:500,
+            icon: Ext.Msg.WARNING,
+            scope:this
+        });
+    },
+
+    procesarEstadoRevertidoC31: function(resp, opt){
+
+        var record = this.getSelectedData();
+        var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+        console.log('ETAPA 1 => reg.ROOT, opt', reg.ROOT, opt);
+        var datos = reg.ROOT.datos;
+
+        if(!reg.ROOT.error){
+
+            Ext.Ajax.request({
+                url:'../../sis_sigep/control/ServiceRequest/procesarEstadoRevertidoC31',
+                params:{
+                    id_service_request : record.id_service_request
+                },
+                success: function (response) {
+                    var rec =  Ext.decode(Ext.util.Format.trim(response.responseText));
+                    var datos = rec.ROOT.datos;
+                    console.log('ETAPA 2 => rec, datos', rec, rec.ROOT);
+                    if(!reg.ROOT.error){
+                        Phx.CP.loadingHide();
+                        Ext.Msg.show({
+                            title: 'Eliminar C31 SIGEP',
+                            msg: '<b>Estimado Funcionario: \n Se elimino satisfactoriamente el Documento C31 Sigep.</b>',
+                            buttons: Ext.Msg.OK,
+                            width: 512,
+                            icon: Ext.Msg.INFO
+                        });
+                    }else{
+                        Phx.CP.loadingHide();
+
+                        Ext.Msg.show({
+                            title: 'Eliminar C31 SIGEP',
+                            msg: '<b>Estimado Funcionario: \n Se tuvo algunos inconvenientes al eliminar el Documento C31 Sigep.</b>',
+                            buttons: Ext.Msg.OK,
+                            width: 512,
+                            icon: Ext.Msg.INFO
+                        });
+                    }
+
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope:this
+            });
+
+        }else{
+            Phx.CP.loadingHide();
+
+            Ext.Msg.show({
+                title: 'Eliminar C31 SIGEP',
+                msg: '<b>Estimado Funcionario: \n Se tuvo algunos inconvenientes al eliminar el Documento C31 Sigep.</b>',
+                buttons: Ext.Msg.OK,
+                width: 512,
+                icon: Ext.Msg.INFO
+            });
+        }
+    },
 			
 	Atributos:[
 		{
@@ -109,6 +208,22 @@ Phx.vista.ServiceRequest=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
+        {
+            config:{
+                name: 'documento_c31',
+                fieldLabel: 'Documento C31',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 130,
+                maxLength:-5
+            },
+            type:'TextField',
+            filters:{pfiltro:'documento_c31',type:'string'},
+            id_grupo:1,
+            //bottom_filter : true,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'fecha_reg',
@@ -204,7 +319,8 @@ Phx.vista.ServiceRequest=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-		
+		{name:'documento_c31', type: 'string'},
+
 	],
 	sortInfo:{
 		field: 'id_service_request',
@@ -216,7 +332,7 @@ Phx.vista.ServiceRequest=Ext.extend(Phx.gridInterfaz,{
 		  height:'50%',
 		  cls:'SigepServiceRequest'
 	},
-	bdel:false,
+	bdel:true,
 	bsave:false,
 	bnew:false,
 	bedit:false,

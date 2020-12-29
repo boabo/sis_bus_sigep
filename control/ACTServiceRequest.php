@@ -62,7 +62,33 @@ class ACTServiceRequest extends ACTbase{
         $this->res=$this->objFunc->setupSigepProcess($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-			
+
+
+
+    /*{developer: franklin.espinoza, date:15/09/2020, description: "Verifica C31 Sistema Sigep"}*/
+    function procesarEstadoRevertidoC31(){
+
+        $response_status = true;
+        while($response_status) {
+
+            $this->objFunc=$this->create('MODSigepServiceRequest');
+            $this->res=$this->objFunc->procesarServices($this->objParam);
+
+            $response = $this->res->datos;
+
+
+            $next = $response['end_process'];
+            if( $next ){
+                $response_status = $next;
+            }else{
+                $response_status = false;
+            }
+
+        }
+
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
 }
 
 ?>

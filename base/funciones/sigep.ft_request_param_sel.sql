@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION sigep.ft_user_mapping_sel (
+CREATE OR REPLACE FUNCTION sigep.ft_request_param_sel (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
@@ -8,15 +8,15 @@ RETURNS varchar AS
 $body$
 /**************************************************************************
  SISTEMA:		Sigep
- FUNCION: 		sigep.ft_user_mapping_sel
- DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'sigep.tuser_mapping'
+ FUNCION: 		sigep.ft_request_param_sel
+ DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'sigep.trequest_param'
  AUTOR: 		 (admin)
- FECHA:	        08-04-2018 11:04:46
+ FECHA:	        29-12-2018 13:30:52
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				08-04-2018 11:04:46								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'sigep.tuser_mapping'
+ #0				29-12-2018 13:30:52								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'sigep.trequest_param'
  #
  ***************************************************************************/
 
@@ -29,42 +29,39 @@ DECLARE
 
 BEGIN
 
-	v_nombre_funcion = 'sigep.ft_user_mapping_sel';
+	v_nombre_funcion = 'sigep.ft_request_param_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
 	/*********************************
- 	#TRANSACCION:  'SIG_USM_SEL'
+ 	#TRANSACCION:  'SIG_REQPAR_SEL'
  	#DESCRIPCION:	Consulta de datos
  	#AUTOR:		admin
- 	#FECHA:		08-04-2018 11:04:46
+ 	#FECHA:		29-12-2018 13:30:52
 	***********************************/
 
-	if(p_transaccion='SIG_USM_SEL')then
+	if(p_transaccion='SIG_REQPAR_SEL')then
 
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						usm.id_user_mapping,
-						usm.refresh_token,
-						usm.sigep_user,
-						usm.access_token,
-						usm.date_issued_at,
-						usm.expires_in,
-						usm.estado_reg,
-						usm.date_issued_rt,
-						usm.pxp_user,
-						usm.id_usuario_ai,
-						usm.id_usuario_reg,
-						usm.fecha_reg,
-						usm.usuario_ai,
-						usm.id_usuario_mod,
-						usm.fecha_mod,
-                        usm.authorization_code,
+						reqpar.id_request_param,
+						reqpar.id_sigep_service_request,
+						reqpar.value,
+						reqpar.ctype,
+						reqpar.name,
+						reqpar.estado_reg,
+						reqpar.id_usuario_ai,
+						reqpar.fecha_reg,
+						reqpar.usuario_ai,
+						reqpar.id_usuario_reg,
+						reqpar.id_usuario_mod,
+						reqpar.fecha_mod,
 						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod
-						from sigep.tuser_mapping usm
-						inner join segu.tusuario usu1 on usu1.id_usuario = usm.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = usm.id_usuario_mod
+						usu2.cuenta as usr_mod,
+                        reqpar.input_output
+						from sigep.trequest_param reqpar
+						inner join segu.tusuario usu1 on usu1.id_usuario = reqpar.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = reqpar.id_usuario_mod
 				        where  ';
 
 			--Definicion de la respuesta
@@ -77,20 +74,20 @@ BEGIN
 		end;
 
 	/*********************************
- 	#TRANSACCION:  'SIG_USM_CONT'
+ 	#TRANSACCION:  'SIG_REQPAR_CONT'
  	#DESCRIPCION:	Conteo de registros
  	#AUTOR:		admin
- 	#FECHA:		08-04-2018 11:04:46
+ 	#FECHA:		29-12-2018 13:30:52
 	***********************************/
 
-	elsif(p_transaccion='SIG_USM_CONT')then
+	elsif(p_transaccion='SIG_REQPAR_CONT')then
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_user_mapping)
-					    from sigep.tuser_mapping usm
-					    inner join segu.tusuario usu1 on usu1.id_usuario = usm.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = usm.id_usuario_mod
+			v_consulta:='select count(id_request_param)
+					    from sigep.trequest_param reqpar
+					    inner join segu.tusuario usu1 on usu1.id_usuario = reqpar.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = reqpar.id_usuario_mod
 					    where ';
 
 			--Definicion de la respuesta
@@ -124,5 +121,5 @@ SECURITY INVOKER
 PARALLEL UNSAFE
 COST 100;
 
-ALTER FUNCTION sigep.ft_user_mapping_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+ALTER FUNCTION sigep.ft_request_param_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
   OWNER TO postgres;

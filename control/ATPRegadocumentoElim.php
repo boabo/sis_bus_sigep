@@ -51,7 +51,7 @@ $payload = $jsonConverter->encode([
     'gestion' => 2020,
     'idEntidad' => 494,
     'idDa' => 15,
-    'nroPreventivo' => -1,
+    'nroPreventivo' => 6310,
     'nroCompromiso' => 1,
     'nroDevengado' => 1,
     'nroPago' => 0,
@@ -82,7 +82,7 @@ $curl = curl_init();
 
 curl_setopt_array($curl, array(
 
-    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:x41m0E1CCYqcehdc6iYnZ10oFjeT8WI9cE53p6OmiUSxczFdwJseEZhpf4jpwYlS7E7x08IP7Xo2K0CJgPbKr9DvA6V8iKInkfV4",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:LC7PzrSKB9sYg3tZx8ZRnR5bGcGQxd4SIU0Cmpl4N1bDTjjb9dkz4wgQr2tIWeqJjV9HChcUYrjBHaVAjjQv2uVAlz0z4RYeAwym",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,

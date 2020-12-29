@@ -31,6 +31,11 @@ DECLARE
 	v_id_service_request	integer;
     v_id_type_service_request	integer;
 
+    --franklin.espinoza 16/08/2020
+    v_service				record;
+	v_exec_order			integer;
+    v_process				boolean = false;
+    v_estado_sigep			varchar;
 BEGIN
 
     v_nombre_funcion = 'sigep.ft_service_request_ime';
@@ -130,6 +135,147 @@ BEGIN
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Service Request eliminado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_service_request',v_parametros.id_service_request::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+
+    /*********************************
+ 	#TRANSACCION:  'SIG_REVERT_STATUS'
+ 	#DESCRIPCION:	Revertir los estados de los servicios sigep
+ 	#AUTOR:		franklin.espinoza
+ 	#FECHA:		15-09-2020 13:10:13
+	***********************************/
+
+	elsif(p_transaccion='SIG_REVERT_STATUS')then
+
+		begin
+			--Sentencia de la eliminacion
+
+            update 	sigep.tsigep_service_request
+        	set status = 'canceled'
+        	where id_service_request = v_parametros.id_service_request and status in ('next_to_execute', 'pending', 'success_revert');
+        	v_exec_order = 1;
+            --revertir anteriores exitosos
+            for v_service in   select tsr.id_sigep_service_request, tsr.status, tsr.id_service_request, tsr.exec_order, tssr.revert_url
+                               from sigep.tsigep_service_request  tsr
+                               inner join sigep.ttype_sigep_service_request tssr on tssr.id_type_sigep_service_request = tsr.id_type_sigep_service_request
+                               where tsr.id_service_request = v_parametros.id_service_request and tsr.status = 'success'
+                               order by tsr.exec_order DESC  loop
+        		if v_service.revert_url != '' and v_service.revert_url is not null then
+                  update 	sigep.tsigep_service_request set
+                  status = (case when v_exec_order = 1 then 'next_to_revert' else 'pending_revert' end),
+                  exec_order = v_exec_order
+                  where id_sigep_service_request = v_service.id_sigep_service_request and
+                        id_service_request = v_parametros.id_service_request;
+
+                  v_exec_order = v_exec_order + 1;
+                else
+                	update 	sigep.tsigep_service_request set
+                  		status = 'canceled'
+                	where id_sigep_service_request = v_service.id_sigep_service_request and
+                          id_service_request = v_parametros.id_service_request;
+                end if;
+                v_process = true;
+            end loop;
+
+
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Service ready to roll back');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_service_request',v_parametros.id_service_request::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'v_process',v_process::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+
+    /*********************************
+ 	#TRANSACCION:  'SIG_READY_C31'
+ 	#DESCRIPCION:	Verificar proceso sigep
+ 	#AUTOR:		franklin.espinoza
+ 	#FECHA:		15-09-2020 13:10:13
+	***********************************/
+
+	elsif(p_transaccion='SIG_READY_C31')then
+
+		begin
+
+        	if v_parametros.estado_reg = 'elaborado'  then
+            	v_estado_sigep = 'verificaDoc';
+            elsif v_parametros.estado_reg = 'verificado' then
+            	if v_parametros.estado_reg = 'verificado' and v_parametros.direction = 'next' then
+            		v_estado_sigep = 'apruebaDoc';
+                else
+                	v_estado_sigep = 'verificaDoc';
+                end if;
+
+                /*select ts.status, tsr.id_sigep_service_request, tsr.exec_order
+                into v_service
+                from sigep.tservice_request ts
+                inner join sigep.tsigep_service_request tsr on tsr.id_service_request = ts.id_service_request
+                inner join sigep.ttype_sigep_service_request tssr on tssr.id_type_sigep_service_request = tsr.id_type_sigep_service_request
+                where ts.id_service_request = v_parametros.id_service_request and tssr.sigep_service_name = v_estado_sigep; */
+
+            elsif v_parametros.estado_reg = 'aprobado' then
+            	if v_parametros.estado_reg = 'aprobado' and v_parametros.direction = 'next' then
+            		v_estado_sigep = 'firmaDoc';
+                else
+                	v_estado_sigep = 'apruebaDoc';
+                end if;
+            end if;
+			--Sentencia de la eliminacion
+			select ts.status, tsr.id_sigep_service_request, tsr.exec_order
+            into v_service
+            from sigep.tservice_request ts
+            inner join sigep.tsigep_service_request tsr on tsr.id_service_request = ts.id_service_request
+            inner join sigep.ttype_sigep_service_request tssr on tssr.id_type_sigep_service_request = tsr.id_type_sigep_service_request
+            where ts.id_service_request = v_parametros.id_service_request and tssr.sigep_service_name = v_estado_sigep;
+
+            if v_service.status = 'success' or v_service.status = 'pending' or v_service.status = 'canceled' then
+            	if v_parametros.direction = 'next' then
+                	update 	sigep.tsigep_service_request set
+                  		status = 'next_to_execute'
+                  	where id_sigep_service_request = v_service.id_sigep_service_request and
+                          id_service_request = v_parametros.id_service_request;
+
+                    for v_service in select tsr.id_sigep_service_request, tsr.status, tsr.id_service_request, tsr.exec_order
+                                     from sigep.tsigep_service_request  tsr
+                                     where tsr.id_service_request = v_parametros.id_service_request and tsr.exec_order > v_service.exec_order
+                                     order by tsr.exec_order asc  loop
+
+                        update 	sigep.tsigep_service_request set
+                        status = 'canceled'
+                        where id_sigep_service_request = v_service.id_sigep_service_request and
+                              id_service_request = v_parametros.id_service_request;
+                    end loop;
+
+                elsif v_parametros.direction = 'previous' then
+                	update 	sigep.tsigep_service_request set
+                		status = 'next_to_revert'
+                	where id_sigep_service_request = v_service.id_sigep_service_request and
+                	      id_service_request = v_parametros.id_service_request;
+
+                    for v_service in select tsr.id_sigep_service_request, tsr.status, tsr.id_service_request, tsr.exec_order
+                                     from sigep.tsigep_service_request  tsr
+                                     where tsr.id_service_request = v_parametros.id_service_request and tsr.exec_order > v_service.exec_order
+                                     order by tsr.exec_order asc  loop
+
+                        update 	sigep.tsigep_service_request set
+                        status = 'canceled'
+                        where id_sigep_service_request = v_service.id_sigep_service_request and
+                              id_service_request = v_parametros.id_service_request;
+                    end loop;
+                end if;
+                v_process = true;
+            end if;
+
+
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Service ready to roll back');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_service_request',v_parametros.id_service_request::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'v_process',v_process::varchar);
 
             --Devuelve la respuesta
             return v_resp;

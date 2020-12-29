@@ -26,7 +26,7 @@ $curl = curl_init();
 
 curl_setopt_array($curl, array(
 
-    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:BHiikfRP2pjJ6jxNbLxJrbOebAg5BQ3qVfgXOTk7oQJZ52Uzi2lcN7gck1Zn1t2yF8EMbz0iMmomxJmb0JCqBTyJzK5Z5X3VwNrZ",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:LC7PzrSKB9sYg3tZx8ZRnR5bGcGQxd4SIU0Cmpl4N1bDTjjb9dkz4wgQr2tIWeqJjV9HChcUYrjBHaVAjjQv2uVAlz0z4RYeAwym",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -41,7 +41,7 @@ curl_setopt_array($curl, array(
 
 $response = curl_exec($curl);
 $err = curl_error($curl);
-
+//var_dump('$response',$response);exit;
 curl_close($curl);
 
 $vs = $_POST['type'];

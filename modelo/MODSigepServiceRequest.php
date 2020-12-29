@@ -130,7 +130,9 @@ class MODSigepServiceRequest extends MODbase{
                             } else if ($estado_c31 == 'aprobado' && $row['status'] == 'pending_queue') {
                                 $this->procesarService($link, $row);
                                 $this->check_cycle = $this->response_status;
-                            }
+                            } /*else {
+                                $this->procesarService($link, $row);
+                            }*/
                         }
                     }
                     /*end franklin.espinoza 16/09/2020*/
@@ -838,6 +840,100 @@ class MODSigepServiceRequest extends MODbase{
             //var_dump('next_to_execute data:',$res);
             return $res;
     }
+
+    /*********** {developer:franklin.espinoza, description: Procesa service de VoBo, date:01/12/2020} ***********/
+    function procesarServicesApproval(){
+
+        $id_service_request = $this->objParam->getParametro('id_service_request');
+        $estado_c31 = $this->objParam->getParametro('estado_c31');
+        $momento = $this->objParam->getParametro('momento');
+
+        $cone = new conexion();
+        $link = $cone->conectarpdo();
+        $procesando = $this->verificarProcesamiento($link);
+
+        if ($procesando == 'no') {
+            $sql = "SELECT ssr.id_sigep_service_request,ssr.id_service_request,ssr.status,ssr.user_name,ssr.queue_id, ssr.queue_revert_id,tsr.sigep_url,tsr.method_type,
+					tsr.queue_url,tsr.queue_method,tsr.revert_url,tsr.revert_method,tsr.sigep_main_container, tsr.require_change_perfil, tsr.sigep_service_name
+					FROM sigep.tsigep_service_request ssr 
+					JOIN sigep.ttype_sigep_service_request tsr ON tsr.id_type_sigep_service_request = ssr.id_type_sigep_service_request
+					WHERE ssr.estado_reg = 'activo' AND ssr.status IN ('next_to_execute','pending_queue','next_to_revert','pending_queue_revert') and 
+                    tsr.sigep_service_name in ('verificaDoc', 'apruebaDoc', 'firmaDoc') and ssr.id_service_request = ".$id_service_request."
+					ORDER BY ssr.id_service_request ASC, ssr.exec_order ASC";
+            try {
+                foreach ($record = $link->query($sql) as $row) {
+                    /*begin franklin.espinoza 16/09/2020*/
+                    if($row['sigep_service_name'] == 'verificaDoc' || $row['sigep_service_name'] == 'apruebaDoc' || $row['sigep_service_name'] == 'firmaDoc'){
+
+                            if ($row['status'] == 'next_to_execute') {
+                                $this->check_cycle = false;
+                                $this->procesarService($link, $row);
+                            } else if ( $row['status'] == 'pending_queue') {
+                                $this->procesarService($link, $row);
+                                $this->check_cycle = $this->response_status;
+                            } else if ($row['status'] == 'next_to_revert') {
+                                $this->check_cycle = false;
+                                $this->procesarService($link, $row);
+                            } else if ($row['status'] == 'pending_queue_revert') {
+                                $this->procesarService($link, $row);
+                                $this->check_cycle = $this->response_status;
+                            }
+
+                    }
+                    /*end franklin.espinoza 16/09/2020*/
+                }
+                $this->modificaProcesamiento($link,'no');
+
+                if($this->check_cycle){
+                    $this->end_process = false;
+                }
+
+                $this->respuesta=new Mensaje();
+                $this->respuesta->setDatos(array(
+                    'end_process'    => $this->end_process
+                ));
+
+                $this->respuesta->setMensaje('EXITO',$this->nombre_archivo,'Procesamiento exitoso SIGEP','Procesamiento exitoso SIGEP','modelo',$this->nombre_archivo,'procesarServices','IME','');
+            } catch (Exception $e) {
+                $this->modificaProcesamiento($link,'no');
+                $this->respuesta=new Mensaje();
+                $this->respuesta->setMensaje('ERROR',$this->nombre_archivo,$e->getMessage(),$e->getMessage(),'modelo','','','','');
+
+            }
+            return $this->respuesta;
+        } else {
+            $this->respuesta=new Mensaje();
+            $mensaje = "Existe un proceso activo, no es posible procesar en este momento";
+            $this->respuesta->setMensaje('ERROR',$this->nombre_archivo,$mensaje,$mensaje,'modelo','','','','');
+            return $this->respuesta;
+        }
+    }
+
+    function procesarServiceApproval($link,$servicio){
+        if (!in_array($servicio['id_service_request'], $this->canceledServices)) { //El servicio no fue cancelado
+
+            $accessToken = $this->getToken($link,$servicio['user_name']);//var_export($accessToken);exit;
+            if ($accessToken == "0") { //ocurrio un error al generar el acces token
+                $this->serviceError($link,$servicio['id_sigep_service_request'],$servicio['id_service_request'],"Error al generar access token para el usuario: ".$servicio['user_name'],'si', 'token');
+            } else {
+                if ($servicio['status'] == 'next_to_execute') {
+                    $this->procesarSigep($link, $accessToken, $servicio['status'], $servicio['sigep_url'], $servicio['method_type'],
+                        $servicio['id_sigep_service_request'], $servicio['id_service_request'], '', $servicio['require_change_perfil']);
+                } else if ($servicio['status'] == 'pending_queue') {
+                    $this->procesarSigep($link,$accessToken,$servicio['status'],$servicio['queue_url'],$servicio['queue_method'],
+                        $servicio['id_sigep_service_request'],$servicio['id_service_request'],$servicio['sigep_main_container'],$servicio['require_change_perfil']);
+                } else if ($servicio['status'] == 'next_to_revert') {
+                    $this->procesarSigep($link,$accessToken,$servicio['status'],$servicio['revert_url'],$servicio['revert_method'],
+                        $servicio['id_sigep_service_request'],$servicio['id_service_request'], '', $servicio['require_change_perfil']);
+
+                } else if ($servicio['status'] == 'pending_queue_revert') {
+                    $this->procesarSigep($link,$accessToken,$servicio['status'],$servicio['queue_url'],$servicio['queue_method'],
+                        $servicio['id_sigep_service_request'],$servicio['id_service_request'],$servicio['sigep_main_container'], $servicio['require_change_perfil']);
+                }
+            }
+        }
+    }
+    /*********** {developer:franklin.espinoza, description: Procesa service de VoBo, date:01/12/2020} ***********/
 
 }
 ?>
