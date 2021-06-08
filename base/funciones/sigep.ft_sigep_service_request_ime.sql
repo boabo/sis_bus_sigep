@@ -43,6 +43,7 @@ DECLARE
     v_end_process			boolean=true;
     v_status_group 			varchar;
 
+    v_orden_sigep			integer;
 BEGIN
 
     v_nombre_funcion = 'sigep.ft_sigep_service_request_ime';
@@ -105,6 +106,12 @@ BEGIN
         	from sigep.tsigep_service_request
         	where id_sigep_service_request = v_parametros.id_sigep_service_request;
 
+            select tssr.exec_order, tssr.status_group
+            into v_orden_sigep, v_status_group
+            from sigep.tsigep_service_request tss
+            inner join sigep.ttype_sigep_service_request tssr on tssr.id_type_sigep_service_request = tss.id_type_sigep_service_request
+        	where id_sigep_service_request = v_parametros.id_sigep_service_request;
+
         	v_cancelar_servicio = 'no';
         	--cancelar request posteriores y revertir previos para el caso de cola de procesamiento normal
         	if (v_service.status IN ('next_to_execute','pending_queue')) then
@@ -127,11 +134,15 @@ BEGIN
         										and status = 'success'
         									group by id_type_sigep_service_request,ssr.exec_order
         									order by ssr.exec_order DESC )loop
-        				update 	sigep.tsigep_service_request
-	        			set status = (case when v_exec_order = 1 then 'next_to_revert' else 'pending_revert' end),
-	        			exec_order = v_exec_order
-	        			where 	v_registros.id_type_sigep_service_request = id_type_sigep_service_request and
-	        					v_service.id_service_request = id_service_request and status = 'success';
+                    	if v_orden_sigep < 6 and v_status_group != 'pass' then
+
+                        	update 	sigep.tsigep_service_request
+                        	set status = (case when v_exec_order = 1 then 'next_to_revert' else 'pending_revert' end),
+                          	exec_order = v_exec_order
+                          	where 	v_registros.id_type_sigep_service_request = id_type_sigep_service_request and
+	        				v_service.id_service_request = id_service_request and status = 'success';
+
+                        end if;
 
 	        			v_exec_order = v_exec_order + 1;
 	        		end loop;

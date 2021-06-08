@@ -269,12 +269,69 @@ class MODSigepServiceRequest extends MODbase{
         );
         //obtener parametros
         $params = $this->getInputParams($link, $id_sigep_service_request,$status);
-        //var_dump('prueba parametros, url, metodo:', $params, $url, $method, $status);
+        //var_dump('prueba parametros, url, metodo:', $params, $url, $method, $status, $require_change_perfil);exit;
         //var_dump('respuesta decode:',$params, $accessToken, $url, $method);exit;
         //var_dump($params, $require_change_perfil, $url, $method, $accessToken);exit;
 
+        if ($method != 'GET') {
+            if ($params['gestion'] == 2020 && $status != 'pending_queue' && $status != 'pending_queue_revert' && $require_change_perfil != 'si') {
+                //var_dump('CAMBIO PERFIL');exit;
+                $param_p = array("gestion" => "2020", "perfil" => $require_change_perfil);
+                $param_p = $jsonConverter->encode($param_p);
+                $curl_p = curl_init();
+
+                $curl_array_p = array(
+                    CURLOPT_URL => 'https://sigep.sigma.gob.bo/rsbeneficiarios/api/cambiaperfil',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'PUT',
+                    CURLOPT_HTTPHEADER => array(
+                        "Authorization: bearer " . $accessToken,
+                        "Cache-Control: no-cache",
+                        "Content-Type: application/json"
+                    ),
+                    CURLOPT_POSTFIELDS => $param_p
+                );
+
+                curl_setopt_array($curl_p, $curl_array_p);
+                $response_p = curl_exec($curl_p);
+                $err_p = curl_error($curl_p);
+                $http_code_p = curl_getinfo($curl_p, CURLINFO_HTTP_CODE);
+                curl_close($curl_p);
+            }else{
+                $param_p = array("gestion" => strval($params['gestion']), "perfil" => $require_change_perfil);
+                $param_p = $jsonConverter->encode($param_p);
+                $curl_p = curl_init();
+
+                $curl_array_p = array(
+                    CURLOPT_URL => 'https://sigep.sigma.gob.bo/rsbeneficiarios/api/cambiaperfil',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'PUT',
+                    CURLOPT_HTTPHEADER => array(
+                        "Authorization: bearer " . $accessToken,
+                        "Cache-Control: no-cache",
+                        "Content-Type: application/json"
+                    ),
+                    CURLOPT_POSTFIELDS => $param_p
+                );
+
+                curl_setopt_array($curl_p, $curl_array_p);
+                $response_p = curl_exec($curl_p);
+                $err_p = curl_error($curl_p);
+                $http_code_p = curl_getinfo($curl_p, CURLINFO_HTTP_CODE);
+                curl_close($curl_p);
+            }
+        }
+
         if($require_change_perfil == 'si'){
-            $param_p = array("gestion" => "2020", "perfil" => "914");
+            $param_p = array("gestion" => "2021", "perfil" => "914");
             $param_p = $jsonConverter->encode($param_p);
             $curl_p = curl_init();
 

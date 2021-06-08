@@ -20,13 +20,12 @@ use Jose\Component\Signature\Serializer\JSONFlattenedSerializer;
  * OBTENER ACCESS TOKEN
  *
  **************************************************/
-//var_dump( $_GET["cola_id"]);exit;
+
 
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-
-    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=EZQ885431300:dDCa5Ko5Q2ONnyfbLJjFDzYryPLsNgArgf1DC07JbfYKWZPc3CoDE5HIvQysgZsvf7re7Y3JjmtJNc8RfCIz9rtaoHvSh317k0Y8",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=VSP287888200:wJMVXn9QcHykXt3dMlGNDT7eXtx9UKvExVIyABfxST8sGa3YR8TDJQCeCsQoTPzVnEvt6Tqmz70FwmeBfOazBRTBRTQywRjEwYJa",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -44,6 +43,18 @@ $err = curl_error($curl);
 
 curl_close($curl);
 
+if (isset($_POST['action'])) {
+
+    if ($_POST['action']=='register') {
+        $nroPreventivo = $_POST['nroPreventivo'];
+        $nroCompromiso = $_POST['nroCompromiso'];
+        $nroDevengado= $_POST['nroDevengado'];
+        $nroPago= $_POST['nroPago'];
+        $fecha = "13/05/2019";
+
+    }
+}
+
 if ($err) {
     echo "cURL Error #:" . $err;
 } else {
@@ -54,10 +65,12 @@ if ($err) {
      *
      **************************************************/
     $token_response = json_decode($response);
+    //var_dump($token_response);exit;
     $access_token = $token_response->{'access_token'};
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "https://sigep.sigma.gob.bo/ejecucion-gasto/api/cola/ega_documentos/" . $_GET["cola_id"],
+
+        CURLOPT_URL => "https://sigep.sigma.gob.bo/RSClasificadores/api/v1/presupuesto?gestion=2020&id_entidad=494&id_da=15&id_ue=15&id_catprg=762878&id_fuente=12&id_objeto=96",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
@@ -71,7 +84,7 @@ if ($err) {
         ),
     ));
 
-    $response = curl_exec($curl);
+    $response = curl_exec($curl); var_dump('respuesta',$response);exit;
     $err = curl_error($curl);
 
     curl_close($curl);
@@ -101,13 +114,20 @@ if ($err) {
 
         // The JSON Converter.
         $jsonConverter = new StandardConverter();
+        var_dump('respuesta:', $response);
 
         $token = $response;
+
+        $usus=json_decode($token, true);
+        //var_dump('BENEFICIARIO:',$usus['data']['beneficiario']);
+
+        echo '<pre>' . var_export(json_decode($token), true) . '</pre>';
 
         $serializer = new JSONFlattenedSerializer($jsonConverter);
 
         // We try to load the token.
         $jws = $serializer->unserialize($token);
+        echo $jws;
         echo '<pre>' . var_export(json_decode($jws->getPayload()), true) . '</pre>';
         //var_dump($jws);
         $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);

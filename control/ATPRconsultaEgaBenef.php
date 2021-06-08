@@ -26,7 +26,7 @@ $curl = curl_init();
 
 curl_setopt_array($curl, array(
 
-    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=CSO313059200:LC7PzrSKB9sYg3tZx8ZRnR5bGcGQxd4SIU0Cmpl4N1bDTjjb9dkz4wgQr2tIWeqJjV9HChcUYrjBHaVAjjQv2uVAlz0z4RYeAwym",
+    CURLOPT_URL => "https://sigep.sigma.gob.bo/rsseguridad/apiseg/token?grant_type=refresh_token&client_id=0&redirect_uri=%2Fmodulo%2Fapiseg%2Fredirect&client_secret=0&refresh_token=HSA373987300:xwyuNye21urvx1nJAmZEOsrJ2m5hfpcivgtWNV1xawK2BGYumG1aG1vNHxx2NAkATWmuyAlCbREkhcw4ThdE9qkqe0gkbXBqbm8h",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     //CURLOPT_MAXREDIRS => 10,
@@ -60,6 +60,38 @@ if (isset($_POST['action'])) {
 
     }
 }
+$token_response = json_decode($response);
+$access_token = $token_response->{'access_token'};
+/** ************************CAMBIO PERFIL*********************** **/
+/*$jsonConverter = new StandardConverter();
+
+$param_p = array("gestion" => "2020", "perfil" => "914");
+$param_p = $jsonConverter->encode($param_p);
+$curl_p = curl_init();
+
+$curl_array_p = array(
+    CURLOPT_URL => 'https://sigep.sigma.gob.bo/rsbeneficiarios/api/cambiaperfil',
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => "",
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'PUT',
+    CURLOPT_HTTPHEADER => array(
+        "Authorization: bearer " . $access_token,
+        "Cache-Control: no-cache",
+        "Content-Type: application/json"
+    ),
+    CURLOPT_POSTFIELDS => $param_p
+);
+
+curl_setopt_array($curl_p, $curl_array_p);
+$response_p = curl_exec($curl_p);
+$err_p = curl_error($curl_p);
+$http_code_p = curl_getinfo($curl_p, CURLINFO_HTTP_CODE);var_dump(curl_getinfo($curl_p));exit;
+curl_close($curl_p);*/
+
+/** ************************CAMBIO PERFIL*********************** **/
 
 if ($err) {
     echo "cURL Error #:" . $err;
@@ -70,12 +102,12 @@ if ($err) {
      * HACER PETICION GET
      *
      **************************************************/
-    $token_response = json_decode($response);
-    $access_token = $token_response->{'access_token'};//var_dump('post que llega:',$_POST, $_POST['action'], $vs, $access_token);exit;
+    //$token_response = json_decode($response);
+    //$access_token = $token_response->{'access_token'};//var_dump('post que llega:',$_POST, $_POST['action'], $vs, $access_token);exit;
     $curl = curl_init();
     curl_setopt_array($curl, array(
 
-        CURLOPT_URL => "https://sigep.sigma.gob.bo/ejecucion-gasto/api/v1/$vs?gestion=2020&idEntidad=494&idDa=15&nroPreventivo=$nroPreventivo&nroCompromiso=$nroCompromiso&nroDevengado=$nroDevengado&nroPago=$nroPago&nroSecuencia=$nroSecuencia",
+        CURLOPT_URL => "https://sigep.sigma.gob.bo/ejecucion-gasto/api/v1/$vs?gestion=2021&idEntidad=494&idDa=15&nroPreventivo=$nroPreventivo&nroCompromiso=$nroCompromiso&nroDevengado=$nroDevengado&nroPago=$nroPago&nroSecuencia=$nroSecuencia",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
